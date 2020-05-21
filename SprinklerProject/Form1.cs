@@ -66,12 +66,15 @@ namespace SprinklerProject
         {
             capture.Read(frame);
             Cv2.PyrUp(frame, frame);            //영상 크기 2배
-            Cv2.PyrUp(frame, frame);            //영상 크기 2배
+            Cv2.PyrUp(frame, frame);            //영상 크기 2배(총 4배)
 
             if (colorMode == 0)
             {
                 Cv2.CvtColor(frame, frame_gray, ColorConversionCodes.BGR2GRAY);
-                Cv2.Threshold(frame_gray, frame_binary, 0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
+                //threshold(src, dst, threshold값, 픽셀값이 threshold값보다 클 경우 이미지의 값, thresholding 타입)
+                //Cv2.Threshold(frame_gray, frame_binary, 0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
+                //Cv2.AdaptiveThreshold(frame_gray, frame_binary, 255, AdaptiveThresholdTypes.MeanC, ThresholdTypes.Otsu, 15, 2);
+                Cv2.Threshold(frame_gray, frame_binary, 100, 255, ThresholdTypes.BinaryInv);
                 frame_result = frame_gray.Clone();
                 
                 //★★★여러가지 모드 테스트 필요
@@ -96,29 +99,68 @@ namespace SprinklerProject
                         Cv2.Rectangle(frame_result, boundingRect, Scalar.Green, 2);
                     }
                 }
-
             }
             else if(colorMode == 1)
             {
-                Cv2.CvtColor(frame, frame_result, ColorConversionCodes.BGR2RGB);
+                //Cv2.CvtColor(frame, frame_result, ColorConversionCodes.BGR2RGB);
+
+                Cv2.CvtColor(frame, frame_gray, ColorConversionCodes.BGR2GRAY);
+                //Cv2.Threshold(frame_gray, frame_binary, 0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
+                Cv2.Threshold(frame_gray, frame_binary, 127, 255, ThresholdTypes.BinaryInv);
+                frame_result = frame_binary;
             }
 
             if (!frame.Empty())
             {
-                image = BitmapConverter.ToBitmap(frame_result);    //Mat 형식을 Bitmap 형식으로
-                //image = BitmapConverter.ToBitmap(frame_binary);    //Mat 형식을 Bitmap 형식으로
-                Color pixelColor = new Color();
-                /*
-                for (int i = 10; i < 100; i++)
-                {
-                    pixelColor = image.GetPixel(i, i);
-                    textBox2.AppendText("[" + i + "]" + pixelColor.ToString() + "\r\n");
-                }
-                */
+                image = BitmapConverter.ToBitmap(frame_result);    //Mat 형식을 Bitmap 형식으로, Format8bppIndexed
+
+                AverageTemp(image);                                 //평균 온도 측정
+
                 pictureBox1.Image = image;
             }
             image = null;   //다시 비워줌
 
+        }
+
+        private void AverageTemp(Bitmap img)
+        {
+            Rectangle rect = new Rectangle(0, 0, img.Width, img.Height);
+            System.Drawing.Imaging.BitmapData bmpData = img.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, img.PixelFormat);
+
+            //Get the address of th first line
+            IntPtr ptr = bmpData.Scan0;
+            
+            //Declare an array to hold the bytes of the bitmap
+            int bytes = Math.Abs(bmpData.Stride) * img.Height;
+            byte[] rgbValues = new byte[bytes];
+            int temperature = 0;
+
+            System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+            int numBytes = 0;
+
+            for (int y = 0; y < img.Height; y++)
+            {
+                for (int x = 0; x < img.Width; x++)
+                {
+                    numBytes = (y * (img.Width * 1)) + (x * 1);     //if RGBA : *1 => *4
+
+                    temperature += (int)rgbValues[numBytes];
+                    if (rgbValues[numBytes] > 125)
+                    {
+                        rgbValues[numBytes] = 0;
+                    }
+                }
+            }
+
+            temperature = temperature / (img.Width * img.Height);
+            textBox2.AppendText("평균 온도 : " + temperature + "\r\n");
+
+            // Copy the RGB values back to the bitmap
+            //System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
+
+            // Unlock the bits.
+            img.UnlockBits(bmpData);
         }
 
         public Form1()
