@@ -30,12 +30,25 @@ namespace SprinklerProject
         int settingCount = 0;
         int colorMode = 0;
         Point[][] contours;
-        Point2d[] vertices = new Point2d[4];
+        DataTable table_spot = new DataTable();
+        DataTable table_spot_show = new DataTable();
         CCI lepton;
         
         HierarchyIndex[] hierarchy;
         CCI.Sys.GainModeObj gainModeObj;
 
+        private void InitTableSpot()
+        {
+            table_spot.Columns.Add("No.", typeof(string));
+            table_spot.Columns.Add("StartX", typeof(string));
+            table_spot.Columns.Add("StartY", typeof(string));
+            table_spot.Columns.Add("EndX", typeof(string));
+            table_spot.Columns.Add("EndY", typeof(string));
+
+            table_spot_show.Columns.Add("No.", typeof(string));
+            table_spot_show.Columns.Add("Start", typeof(string));
+            table_spot_show.Columns.Add("End", typeof(string));
+        }
 
         private void CaptureCamera()
         {
@@ -80,6 +93,7 @@ namespace SprinklerProject
         {
             settingCount = 0;
             int tempflag = 0;
+            CheckForIllegalCrossThreadCalls = false;
             this.Invoke(new Action(delegate ()
             {
                 tempflag =isCameraRunning;
@@ -170,11 +184,8 @@ namespace SprinklerProject
         private void ImageProcess()
         {
             byte[] writeBuffer = new byte[4];
-            int i = 0;
-            DataTable table = new DataTable();
-            table.Columns.Add("No.", typeof(string));
-            table.Columns.Add("Start", typeof(string));
-            table.Columns.Add("End", typeof(string));
+            int spot_count = 0;
+            int flag_addSpot = 0;
 
             capture.Read(frame);
             Cv2.PyrUp(frame, frame);            //영상 크기 2배
@@ -192,45 +203,76 @@ namespace SprinklerProject
                 //★★★여러가지 모드 테스트 필요
                 Cv2.FindContours(frame_binary, out contours, out hierarchy, RetrievalModes.List, ContourApproximationModes.ApproxSimple);
 
-                foreach (Point[] p in contours)
+                table_spot_show.Rows.Clear(); //★★★
+                table_spot.Rows.Clear(); //★★★
+
+                try
                 {
-                    double area = Cv2.ContourArea(p, true);
-
-                    if (area > 50)
+                    foreach (Point[] p in contours)
                     {
-                        Rect boundingRect = Cv2.BoundingRect(p);
-                        //나중에 지우기
-                        vertices[0].X = boundingRect.X;
-                        vertices[0].Y = boundingRect.Y + boundingRect.Height;
-                        vertices[1].X = boundingRect.X;
-                        vertices[1].Y = boundingRect.Y;
-                        vertices[2].X = boundingRect.X + boundingRect.Width;
-                        vertices[2].Y = boundingRect.Y;
-                        vertices[3].X = boundingRect.X + boundingRect.Width;
-                        vertices[3].Y = boundingRect.Y + boundingRect.Height;
-                        //여기까지
+                        double area = Cv2.ContourArea(p, true);
 
-                        writeBuffer[0] = Convert.ToByte(boundingRect.X / 4);
-                        writeBuffer[1] = Convert.ToByte(boundingRect.Y / 4);
-                        writeBuffer[2] = Convert.ToByte((boundingRect.X + boundingRect.Width) / 4);
-                        writeBuffer[3] = Convert.ToByte((boundingRect.Y + boundingRect.Height) / 4);
+                        if (area > 100 && cbGainMode.Text == "LOW")
+                        {
+                            Rect boundingRect = Cv2.BoundingRect(p);
+                            flag_addSpot = 0;
 
-                        Cv2.Rectangle(frame_result, boundingRect, Scalar.Green, 2);
+                            writeBuffer[0] = Convert.ToByte(boundingRect.X / 4);
+                            writeBuffer[1] = Convert.ToByte(boundingRect.Y / 4);
+                            writeBuffer[2] = Convert.ToByte((boundingRect.X + boundingRect.Width) / 4);
+                            writeBuffer[3] = Convert.ToByte((boundingRect.Y + boundingRect.Height) / 4);
 
-                        table.Rows.Add(i+1, "(" + writeBuffer[0] + ", " + writeBuffer[1] + ")", "(" + writeBuffer[2] + ", " + writeBuffer[3] + ")");
-                        dataGridView1.DataSource = table;
-                        i++;
+                            Cv2.Rectangle(frame_result, boundingRect, Scalar.Black, 2);
+                            
+                            if (table_spot.Rows.Count > 0)
+                            {
+                                for (int i = 0; i < table_spot.Rows.Count; i++)
+                                {
+                                    //사각형 두개가 겹치는 조건
+                                    if (writeBuffer[0] <= Convert.ToByte(table_spot.Rows[i][3]) && writeBuffer[2] >= Convert.ToByte(table_spot.Rows[i][1]) &&
+                                        writeBuffer[1] <= Convert.ToByte(table_spot.Rows[i][4]) && writeBuffer[3] >= Convert.ToByte(table_spot.Rows[i][2]))
+                                    {
+                                        //기존 영역 확장
+                                        if (writeBuffer[0] < Convert.ToByte(table_spot.Rows[i][1]))
+                                            table_spot.Rows[i][1] = writeBuffer[0];
+                                        if (writeBuffer[1] < Convert.ToByte(table_spot.Rows[i][2]))
+                                            table_spot.Rows[i][2] = writeBuffer[1];
+                                        if (writeBuffer[2] > Convert.ToByte(table_spot.Rows[i][3]))
+                                            table_spot.Rows[i][3] = writeBuffer[2];
+                                        if (writeBuffer[3] > Convert.ToByte(table_spot.Rows[i][4]))
+                                            table_spot.Rows[i][4] = writeBuffer[3];
 
-                        /*
-                        textBox2.AppendText("start X : " + writeBuffer[0] + "\r\n");
-                        textBox2.AppendText("start Y : " + writeBuffer[1] + "\r\n");
-                        textBox2.AppendText("end X : " + writeBuffer[2] + "\r\n");
-                        textBox2.AppendText("end Y : " + writeBuffer[3] + "\r\n");
-                        */
+                                        table_spot_show.Rows.Add(i + 1, "(" + table_spot.Rows[i][1] + ", " + table_spot.Rows[i][2] + ")",
+                                            "(" + table_spot.Rows[i][3] + ", " + table_spot.Rows[i][4] + ")");
+                                        flag_addSpot = 1;
+                                    }
+                                }
+                            }
+                            if (flag_addSpot == 0)
+                            {
+                                table_spot.Rows.Add(spot_count + 1, writeBuffer[0], writeBuffer[1], writeBuffer[2], writeBuffer[3]);
+                                table_spot_show.Rows.Add(spot_count + 1 + "NEW", "(" + table_spot.Rows[spot_count][1] + ", " + table_spot.Rows[spot_count][2] + ")",
+                                    "(" + table_spot.Rows[spot_count][3] + ", " + table_spot.Rows[spot_count][4] + ")");
+                                spot_count++;
+                            }
 
-                        SerialWrite(writeBuffer);
+                            dataGridView1.DataSource = table_spot_show;
+                            dataGridView2.DataSource = table_spot;
+                            Thread.Sleep(100);
+
+                            SerialWrite(writeBuffer);
+                        }
                     }
                 }
+                catch (NullReferenceException)
+                {
+                    MessageBox.Show("Empty Datatable");
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    MessageBox.Show("Empty Datatable");
+                }
+
             }
             else if (colorMode == 1)
             {
@@ -322,12 +364,13 @@ namespace SprinklerProject
         public Form1()
         {
             InitializeComponent();
+            InitTableSpot();
 
-            var devices = Lepton.CCI.GetDevices();
-            var device = devices[0];
-            lepton = device.Open();
+            //var devices = Lepton.CCI.GetDevices();
+            //var device = devices[0];
+            //lepton = device.Open();
 
-
+            /*
             Console.WriteLine("lepton.sys.GetCameraUpTime() : " + lepton.sys.GetCameraUpTime() + "\n\n");
 
             Console.WriteLine("\n\n==========Before Setting==========");
@@ -388,6 +431,7 @@ namespace SprinklerProject
             Console.WriteLine("rad.TLinearEnableState : " + lepton.rad.GetTLinearEnableState());
             Console.WriteLine("rad.TLinearResolution : " + lepton.rad.GetTLinearResolution());
             Console.WriteLine("rad.TLinearAutoResolution : " + lepton.rad.GetTLinearAutoResolution());
+            */
         }
 
         #region CheckBox Event
@@ -449,6 +493,21 @@ namespace SprinklerProject
         #endregion
 
         #region Button Event
+        private void btnOpen_Click(object sender, EventArgs e)
+        {
+            if(btnOpen.Text.Equals("Open"))
+            {
+                var devices = Lepton.CCI.GetDevices();
+                try {
+                    var device = devices[0];
+                    lepton = device.Open();
+                    btnOpen.Enabled = false;
+                    MessageBox.Show("Device Opened");
+                }
+                catch (Exception) { MessageBox.Show("Please Connect Camera"); }
+            }
+        }
+
         private void btnStart_Click(object sender, EventArgs e)
         {
             if (btnStart.Text.Equals("Start"))
@@ -513,6 +572,13 @@ namespace SprinklerProject
                 btnCamTab.Enabled = true;
             }
         }
+
+        private void btnGetPort_Click(object sender, EventArgs e)
+        {
+            String[] port = SerialPort.GetPortNames();
+            cbCom.Items.Clear();
+            cbCom.Items.AddRange(port);
+        }
         #endregion
 
         #region RadioButton Event
@@ -520,13 +586,6 @@ namespace SprinklerProject
         {
             if (rbtnRGB.Checked)
                 colorMode = 2;
-        }
-
-        private void btnGetPort_Click(object sender, EventArgs e)
-        {
-            String[] port = SerialPort.GetPortNames();
-            cbCom.Items.Clear();
-            cbCom.Items.AddRange(port);
         }
 
         private void rbtnGrayScale_CheckedChanged(object sender, EventArgs e)

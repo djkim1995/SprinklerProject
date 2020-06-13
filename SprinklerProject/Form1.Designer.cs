@@ -62,6 +62,9 @@
             this.SerialPort = new System.IO.Ports.SerialPort(this.components);
             this.Tab_MAIN = new System.Windows.Forms.TabControl();
             this.camPage = new System.Windows.Forms.TabPage();
+            this.btnOpen = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.portPage = new System.Windows.Forms.TabPage();
             this.btnGetPort = new System.Windows.Forms.Button();
             this.cbCom = new System.Windows.Forms.ComboBox();
@@ -69,17 +72,17 @@
             this.btnPortTab = new System.Windows.Forms.Button();
             this.btnCamTab = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.dataGridView2 = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.gbSettings.SuspendLayout();
             this.gbTemperature.SuspendLayout();
             this.Tab_MAIN.SuspendLayout();
             this.camPage.SuspendLayout();
-            this.portPage.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.portPage.SuspendLayout();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
             // 
             // pictureBox1
@@ -92,9 +95,9 @@
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(6, 446);
+            this.btnStart.Location = new System.Drawing.Point(107, 446);
             this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(190, 48);
+            this.btnStart.Size = new System.Drawing.Size(95, 48);
             this.btnStart.TabIndex = 1;
             this.btnStart.Text = "Start";
             this.btnStart.UseVisualStyleBackColor = true;
@@ -404,6 +407,7 @@
             // camPage
             // 
             this.camPage.BackColor = System.Drawing.Color.White;
+            this.camPage.Controls.Add(this.btnOpen);
             this.camPage.Controls.Add(this.groupBox1);
             this.camPage.Controls.Add(this.tbInfo);
             this.camPage.Controls.Add(this.gbTemperature);
@@ -420,6 +424,37 @@
             this.camPage.Size = new System.Drawing.Size(1193, 515);
             this.camPage.TabIndex = 1;
             this.camPage.Text = "Camera";
+            // 
+            // btnOpen
+            // 
+            this.btnOpen.Location = new System.Drawing.Point(6, 446);
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Size = new System.Drawing.Size(95, 48);
+            this.btnOpen.TabIndex = 17;
+            this.btnOpen.Text = "Open";
+            this.btnOpen.UseVisualStyleBackColor = true;
+            this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.dataGridView2);
+            this.groupBox1.Controls.Add(this.dataGridView1);
+            this.groupBox1.Location = new System.Drawing.Point(854, 77);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(316, 363);
+            this.groupBox1.TabIndex = 16;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Location";
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.dataGridView1.Location = new System.Drawing.Point(6, 20);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.RowTemplate.Height = 23;
+            this.dataGridView1.Size = new System.Drawing.Size(304, 193);
+            this.dataGridView1.TabIndex = 0;
             // 
             // portPage
             // 
@@ -490,24 +525,15 @@
             this.panel1.Size = new System.Drawing.Size(1201, 541);
             this.panel1.TabIndex = 15;
             // 
-            // groupBox1
+            // dataGridView2
             // 
-            this.groupBox1.Controls.Add(this.dataGridView1);
-            this.groupBox1.Location = new System.Drawing.Point(854, 77);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(316, 223);
-            this.groupBox1.TabIndex = 16;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Location";
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            this.dataGridView1.Location = new System.Drawing.Point(6, 20);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(304, 193);
-            this.dataGridView1.TabIndex = 0;
+            this.dataGridView2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            this.dataGridView2.Location = new System.Drawing.Point(6, 222);
+            this.dataGridView2.Name = "dataGridView2";
+            this.dataGridView2.RowTemplate.Height = 23;
+            this.dataGridView2.Size = new System.Drawing.Size(304, 135);
+            this.dataGridView2.TabIndex = 1;
             // 
             // Form1
             // 
@@ -529,11 +555,12 @@
             this.Tab_MAIN.ResumeLayout(false);
             this.camPage.ResumeLayout(false);
             this.camPage.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.portPage.ResumeLayout(false);
             this.portPage.PerformLayout();
             this.panel1.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -581,6 +608,8 @@
         private System.Windows.Forms.Label lblCom;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Button btnOpen;
+        private System.Windows.Forms.DataGridView dataGridView2;
     }
 }
 
