@@ -24,45 +24,19 @@ namespace SprinklerProject
         VideoCapture capture;
         Mat frame, frame_gray, frame_binary, frame_result;
         Bitmap image;
-        private Thread camera;
-        public Thread settings;
         int isCameraRunning = 0;
         int settingCount = 0;
         int colorMode = 0;
         Point[][] contours;
-        DataTable table_spot = new DataTable();
-        DataTable table_spot_show = new DataTable();
+        
+        List<byte[]> spotList = new List<byte[]>();
+
         CCI lepton;
         
         HierarchyIndex[] hierarchy;
         CCI.Sys.GainModeObj gainModeObj;
-
-        private void InitTableSpot()
-        {
-            table_spot.Columns.Add("No.", typeof(string));
-            table_spot.Columns.Add("StartX", typeof(string));
-            table_spot.Columns.Add("StartY", typeof(string));
-            table_spot.Columns.Add("EndX", typeof(string));
-            table_spot.Columns.Add("EndY", typeof(string));
-
-            table_spot_show.Columns.Add("No.", typeof(string));
-            table_spot_show.Columns.Add("Start", typeof(string));
-            table_spot_show.Columns.Add("End", typeof(string));
-        }
-
-        private void CaptureCamera()
-        {
-            camera = new Thread(new ThreadStart(CaptureCameraCallback));
-            camera.Start();
-        }
-
-        private void SettingsThread()
-        {
-            settings = new Thread(new ThreadStart(SettingsCallback));
-            settings.Start();
-        }
-
-        private void CaptureCameraCallback()
+        
+        private void Init_Camera()
         {
             frame = new Mat();
             frame_gray = new Mat();
@@ -80,220 +54,279 @@ namespace SprinklerProject
             {
                 tbInfo.AppendText("width : " + capture.FrameWidth + ", height : " + capture.FrameHeight + "\r\n");
             }
-
-            while (isCameraRunning == 1)
-            {
-                ImageProcess();
-                //textBox2.AppendText("isCameraRunning = " + isCameraRunning + "\r\n");
-            }
         }
 
-
-        private void SettingsCallback()
+        private void Setting(object sender, EventArgs e)
         {
-            settingCount = 0;
-            int tempflag = 0;
-            CheckForIllegalCrossThreadCalls = false;
-            this.Invoke(new Action(delegate ()
+            switch (settingCount)
             {
-                tempflag =isCameraRunning;
-            }));
+                case 0:
+                    //GetVideoOutputFormat
+                    if (lepton.vid.GetVideoOutputFormat().Equals(CCI.Vid.VideoOutputFormat.RAW14))
+                        cbFormat.SelectedIndex = 0;
+                    else if (lepton.vid.GetVideoOutputFormat().Equals(CCI.Vid.VideoOutputFormat.RGB888))
+                        cbFormat.SelectedIndex = 1;
+                    else
+                        MessageBox.Show(lepton.vid.GetVideoOutputFormat() + "Format 설정 오류 발생");
+                    break;
 
-            while (tempflag == 1)
-            {
-                //textBox2.AppendText("isCameraRunning = " + isCameraRunning + ", count : " + settingCount + "\r\n");
-                switch (settingCount)
-                {
-                    case 0:
-                        //GetVideoOutputFormat
-                        if (lepton.vid.GetVideoOutputFormat().Equals(CCI.Vid.VideoOutputFormat.RAW14))
-                            cbFormat.SelectedIndex = 0;
-                        else if (lepton.vid.GetVideoOutputFormat().Equals(CCI.Vid.VideoOutputFormat.RGB888))
-                            cbFormat.SelectedIndex = 1;
-                        else
-                            MessageBox.Show(lepton.vid.GetVideoOutputFormat() + "Format 설정 오류 발생");
-                        break;
+                case 1:
+                    //GetGainMode
+                    if (lepton.sys.GetGainMode().Equals(CCI.Sys.GainMode.LOW))
+                        cbGainMode.SelectedIndex = 0;
+                    else if (lepton.sys.GetGainMode().Equals(CCI.Sys.GainMode.HIGH))
+                        cbGainMode.SelectedIndex = 1;
+                    else
+                        MessageBox.Show(lepton.sys.GetGainMode() + "Format 설정 오류 발생");
+                    break;
 
-                    case 1:
-                        //GetGainMode
-                        if (lepton.sys.GetGainMode().Equals(CCI.Sys.GainMode.LOW))
-                            cbGainMode.SelectedIndex = 0;
-                        else if (lepton.sys.GetGainMode().Equals(CCI.Sys.GainMode.HIGH))
-                            cbGainMode.SelectedIndex = 1;
-                        else
-                            MessageBox.Show(lepton.sys.GetGainMode() + "Format 설정 오류 발생");
-                        break;
+                case 2:
+                    //GetEnableState
+                    if (lepton.agc.GetEnableState().Equals(CCI.Agc.Enable.DISABLE))
+                        cbAgcEnable.SelectedIndex = 0;
+                    else if (lepton.agc.GetEnableState().Equals(CCI.Agc.Enable.ENABLE))
+                        cbAgcEnable.SelectedIndex = 1;
+                    else
+                        MessageBox.Show(lepton.agc.GetEnableState() + "Format 설정 오류 발생");
+                    break;
 
-                    case 2:
-                        //GetEnableState
-                        if (lepton.agc.GetEnableState().Equals(CCI.Agc.Enable.DISABLE))
-                            cbAgcEnable.SelectedIndex = 0;
-                        else if (lepton.agc.GetEnableState().Equals(CCI.Agc.Enable.ENABLE))
-                            cbAgcEnable.SelectedIndex = 1;
-                        else
-                            MessageBox.Show(lepton.agc.GetEnableState() + "Format 설정 오류 발생");
-                        break;
+                case 3:
+                    //GetCalcEnableState
+                    if (lepton.agc.GetCalcEnableState().Equals(CCI.Agc.Enable.DISABLE))
+                        cbAgcCalcEnable.SelectedIndex = 0;
+                    else if (lepton.agc.GetCalcEnableState().Equals(CCI.Agc.Enable.ENABLE))
+                        cbAgcCalcEnable.SelectedIndex = 1;
+                    else
+                        MessageBox.Show(lepton.agc.GetCalcEnableState() + "Format 설정 오류 발생");
+                    break;
 
-                    case 3:
-                        //GetCalcEnableState
-                        if (lepton.agc.GetCalcEnableState().Equals(CCI.Agc.Enable.DISABLE))
-                            cbAgcCalcEnable.SelectedIndex = 0;
-                        else if (lepton.agc.GetCalcEnableState().Equals(CCI.Agc.Enable.ENABLE))
-                            cbAgcCalcEnable.SelectedIndex = 1;
-                        else
-                            MessageBox.Show(lepton.agc.GetCalcEnableState() + "Format 설정 오류 발생");
-                        break;
+                case 4:
+                    //GetEnableState
+                    if (lepton.rad.GetEnableState().Equals(CCI.Rad.Enable.DISABLE))
+                        cbRadEnable.SelectedIndex = 0;
+                    else if (lepton.rad.GetEnableState().Equals(CCI.Rad.Enable.ENABLE))
+                        cbRadEnable.SelectedIndex = 1;
+                    else
+                        MessageBox.Show(lepton.rad.GetEnableState() + "Format 설정 오류 발생");
+                    break;
 
-                    case 4:
-                        //GetEnableState
-                        if (lepton.rad.GetEnableState().Equals(CCI.Rad.Enable.DISABLE))
-                            cbRadEnable.SelectedIndex = 0;
-                        else if (lepton.rad.GetEnableState().Equals(CCI.Rad.Enable.ENABLE))
-                            cbRadEnable.SelectedIndex = 1;
-                        else
-                            MessageBox.Show(lepton.rad.GetEnableState() + "Format 설정 오류 발생");
-                        break;
+                case 5:
+                    //GetTLinearEnableState
+                    if (lepton.rad.GetTLinearEnableState().Equals(CCI.Rad.Enable.DISABLE))
+                        cbTLinearEnable.SelectedIndex = 0;
+                    else if (lepton.rad.GetTLinearEnableState().Equals(CCI.Rad.Enable.ENABLE))
+                        cbTLinearEnable.SelectedIndex = 1;
+                    else
+                        MessageBox.Show(lepton.rad.GetTLinearEnableState() + "Format 설정 오류 발생");
+                    break;
 
-                    case 5:
-                        //GetTLinearEnableState
-                        if (lepton.rad.GetTLinearEnableState().Equals(CCI.Rad.Enable.DISABLE))
-                            cbTLinearEnable.SelectedIndex = 0;
-                        else if (lepton.rad.GetTLinearEnableState().Equals(CCI.Rad.Enable.ENABLE))
-                            cbTLinearEnable.SelectedIndex = 1;
-                        else
-                            MessageBox.Show(lepton.rad.GetTLinearEnableState() + "Format 설정 오류 발생");
-                        break;
-
-                    case 6:
-                        //GetPolarity
-                        if (lepton.vid.GetPolarity().Equals(CCI.Vid.Polarity.BLACK_HOT))
-                            cbHotColor.SelectedIndex = 0;
-                        if (lepton.vid.GetPolarity().Equals(CCI.Vid.Polarity.WHITE_HOT))
-                            cbHotColor.SelectedIndex = 1;
-                        else
-                            MessageBox.Show(lepton.vid.GetPolarity() + "Format 설정 오류 발생");
-                        break;
-                    default:
-                        break;
-                }
-                settingCount++;
-                Thread.Sleep(1000);
+                case 6:
+                    //GetPolarity
+                    if (lepton.vid.GetPolarity().Equals(CCI.Vid.Polarity.BLACK_HOT))
+                        cbHotColor.SelectedIndex = 0;
+                    if (lepton.vid.GetPolarity().Equals(CCI.Vid.Polarity.WHITE_HOT))
+                        cbHotColor.SelectedIndex = 1;
+                    else
+                        MessageBox.Show(lepton.vid.GetPolarity() + "Format 설정 오류 발생");
+                    break;
+                default:
+                    break;
             }
+            settingCount++;
         }
 
-        private void ImageProcess()
+        private void ImageProcess(object sender, EventArgs e)
         {
-            byte[] writeBuffer = new byte[4];
-            int spot_count = 0;
-            int flag_addSpot = 0;
+            this.Invoke(new EventHandler(ImageProcessHandler));
+        }
 
-            capture.Read(frame);
-            Cv2.PyrUp(frame, frame);            //영상 크기 2배
-            Cv2.PyrUp(frame, frame);            //영상 크기 2배(총 4배)
-
-            if (colorMode == 0)
+        private void ImageProcessHandler(object sender, EventArgs e)
+        {
+            try
             {
-                Cv2.CvtColor(frame, frame_gray, ColorConversionCodes.BGR2GRAY);
-                //threshold(src, dst, threshold값, 픽셀값이 threshold값보다 클 경우 이미지의 값, thresholding 타입)
-                //Cv2.Threshold(frame_gray, frame_binary, 0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
-                //Cv2.AdaptiveThreshold(frame_gray, frame_binary, 255, AdaptiveThresholdTypes.MeanC, ThresholdTypes.Otsu, 15, 2);
-                Cv2.Threshold(frame_gray, frame_binary, 200, 255, ThresholdTypes.BinaryInv);
-                frame_result = frame_gray.Clone();
-                
-                //★★★여러가지 모드 테스트 필요
-                Cv2.FindContours(frame_binary, out contours, out hierarchy, RetrievalModes.List, ContourApproximationModes.ApproxSimple);
+                byte[] writeBuffer = new byte[4];
 
-                table_spot_show.Rows.Clear(); //★★★
-                table_spot.Rows.Clear(); //★★★
+                capture.Read(frame);
+                Cv2.PyrUp(frame, frame);            //영상 크기 2배
+                Cv2.PyrUp(frame, frame);            //영상 크기 2배(총 4배)
 
-                try
+
+                if (colorMode == 0)
                 {
-                    foreach (Point[] p in contours)
+                    Cv2.CvtColor(frame, frame_gray, ColorConversionCodes.BGR2GRAY);
+                    //threshold(src, dst, threshold값, 픽셀값이 threshold값보다 클 경우 이미지의 값, thresholding 타입)
+                    //Cv2.Threshold(frame_gray, frame_binary, 0, 255, ThresholdTypes.BinaryInv | ThresholdTypes.Otsu);
+                    //Cv2.AdaptiveThreshold(frame_gray, frame_binary, 255, AdaptiveThresholdTypes.MeanC, ThresholdTypes.Otsu, 15, 2);
+                    Cv2.Threshold(frame_gray, frame_binary, 200, 255, ThresholdTypes.BinaryInv);
+                    frame_result = frame_gray.Clone();
+
+                    //★★★여러가지 모드 테스트 필요
+                    Cv2.FindContours(frame_binary, out contours, out hierarchy, RetrievalModes.List, ContourApproximationModes.ApproxSimple);
+                    
+                    SpotRemove();
+
+                    try
                     {
-                        double area = Cv2.ContourArea(p, true);
-
-                        if (area > 100 && cbGainMode.Text == "LOW")
+                        foreach (Point[] p in contours)
                         {
-                            Rect boundingRect = Cv2.BoundingRect(p);
-                            flag_addSpot = 0;
+                            double area = Cv2.ContourArea(p, true);
 
-                            writeBuffer[0] = Convert.ToByte(boundingRect.X / 4);
-                            writeBuffer[1] = Convert.ToByte(boundingRect.Y / 4);
-                            writeBuffer[2] = Convert.ToByte((boundingRect.X + boundingRect.Width) / 4);
-                            writeBuffer[3] = Convert.ToByte((boundingRect.Y + boundingRect.Height) / 4);
-
-                            Cv2.Rectangle(frame_result, boundingRect, Scalar.Black, 2);
-                            
-                            if (table_spot.Rows.Count > 0)
+                            if (area > 100 && cbGainMode.Text == "LOW")
                             {
-                                for (int i = 0; i < table_spot.Rows.Count; i++)
-                                {
-                                    //사각형 두개가 겹치는 조건
-                                    if (writeBuffer[0] <= Convert.ToByte(table_spot.Rows[i][3]) && writeBuffer[2] >= Convert.ToByte(table_spot.Rows[i][1]) &&
-                                        writeBuffer[1] <= Convert.ToByte(table_spot.Rows[i][4]) && writeBuffer[3] >= Convert.ToByte(table_spot.Rows[i][2]))
-                                    {
-                                        //기존 영역 확장
-                                        if (writeBuffer[0] < Convert.ToByte(table_spot.Rows[i][1]))
-                                            table_spot.Rows[i][1] = writeBuffer[0];
-                                        if (writeBuffer[1] < Convert.ToByte(table_spot.Rows[i][2]))
-                                            table_spot.Rows[i][2] = writeBuffer[1];
-                                        if (writeBuffer[2] > Convert.ToByte(table_spot.Rows[i][3]))
-                                            table_spot.Rows[i][3] = writeBuffer[2];
-                                        if (writeBuffer[3] > Convert.ToByte(table_spot.Rows[i][4]))
-                                            table_spot.Rows[i][4] = writeBuffer[3];
+                                Rect boundingRect = Cv2.BoundingRect(p);
 
-                                        table_spot_show.Rows.Add(i + 1, "(" + table_spot.Rows[i][1] + ", " + table_spot.Rows[i][2] + ")",
-                                            "(" + table_spot.Rows[i][3] + ", " + table_spot.Rows[i][4] + ")");
-                                        flag_addSpot = 1;
-                                    }
-                                }
+                                writeBuffer[0] = Convert.ToByte(boundingRect.X / 4);
+                                writeBuffer[1] = Convert.ToByte(boundingRect.Y / 4);
+                                writeBuffer[2] = Convert.ToByte((boundingRect.X + boundingRect.Width) / 4);
+                                writeBuffer[3] = Convert.ToByte((boundingRect.Y + boundingRect.Height) / 4);
+
+                                Cv2.Rectangle(frame_result, boundingRect, Scalar.Black, 2);
+
+                                SpotCheck(writeBuffer);     // 좌표 비교 및 alive 비교
                             }
-                            if (flag_addSpot == 0)
-                            {
-                                table_spot.Rows.Add(spot_count + 1, writeBuffer[0], writeBuffer[1], writeBuffer[2], writeBuffer[3]);
-                                table_spot_show.Rows.Add(spot_count + 1 + "NEW", "(" + table_spot.Rows[spot_count][1] + ", " + table_spot.Rows[spot_count][2] + ")",
-                                    "(" + table_spot.Rows[spot_count][3] + ", " + table_spot.Rows[spot_count][4] + ")");
-                                spot_count++;
-                            }
-
-                            dataGridView1.DataSource = table_spot_show;
-                            dataGridView2.DataSource = table_spot;
-                            Thread.Sleep(100);
-
-                            SerialWrite(writeBuffer);
                         }
+                        ListViewUpdate();
                     }
+                    catch (NullReferenceException) { MessageBox.Show("Empty Datatable"); }
+                    catch (IndexOutOfRangeException) { MessageBox.Show("Empty Datatable"); }
                 }
-                catch (NullReferenceException)
+                else if (colorMode == 1)
                 {
-                    MessageBox.Show("Empty Datatable");
+                    Cv2.CvtColor(frame, frame_gray, ColorConversionCodes.BGR2GRAY);
+                    Cv2.Threshold(frame_gray, frame_binary, 200, 255, ThresholdTypes.Binary);
+                    frame_result = frame_binary;
                 }
-                catch (IndexOutOfRangeException)
+                else if (colorMode == 2)
                 {
-                    MessageBox.Show("Empty Datatable");
+                    frame_result = frame;
                 }
 
+                if (!frame.Empty())
+                {
+                    image = BitmapConverter.ToBitmap(frame_result);    //Mat 형식을 Bitmap 형식으로, Format8bppIndexed
+
+                    AverageTemp(image);                                 //평균 온도 측정
+
+                    pictureBox1.Image = image;
+                }
+                image = null;   //다시 비워줌
+
             }
-            else if (colorMode == 1)
+            catch (ObjectDisposedException)
             {
-                Cv2.CvtColor(frame, frame_gray, ColorConversionCodes.BGR2GRAY);
-                Cv2.Threshold(frame_gray, frame_binary, 200, 255, ThresholdTypes.Binary);
-                frame_result = frame_binary;
+                MessageBox.Show("frame load error");
             }
-            else if (colorMode == 2)
+        }
+
+        private void SpotRemove()
+        {
+            int count = spotList.Count;
+            for (int i = 0; i < count; i++)
             {
-                frame_result = frame;
+                spotList.RemoveAt(0);
+            }
+        }
+
+        private void SpotCheck(byte[] writeBuffer)
+        {
+            spotList.Add(new byte[4]);      //[startX, startY, endX, endY, aliveCheck]
+            for (int i = 0; i < 4; i++)
+            {
+                spotList[spotList.Count - 1][i] = writeBuffer[i];
+            }
+            /*
+            if (spotList.Count == 0)
+            {
+                spotList.Add(new byte[5]);      //[startX, startY, endX, endY, aliveCheck]
+                for (int i = 0; i < 4; i++)
+                {
+                    spotList[spotList.Count - 1][i] = writeBuffer[i];
+                }
+                spotList[spotList.Count - 1][4] = 1;
+            }
+            else
+            {
+                int flag_ditect = 0;
+
+                //겹치면 확장
+                for (int i = 0; i < spotList.Count; i++)
+                {
+                    //일단 aliveCheck 내림
+                    spotList[i][4] = 0;
+
+                    //두 사각형이 겹치는 조건
+                    if (writeBuffer[0] <= spotList[i][2] && writeBuffer[1] <= spotList[i][3] &&
+                       writeBuffer[2] >= spotList[i][0] && writeBuffer[3] >= spotList[i][1])
+                    {
+                        if (writeBuffer[0] < spotList[i][0])
+                            spotList[i][0] = writeBuffer[0];
+                        if (writeBuffer[1] < spotList[i][1])
+                            spotList[i][1] = writeBuffer[1];
+                        if (writeBuffer[2] > spotList[i][2])
+                            spotList[i][2] = writeBuffer[2];
+                        if (writeBuffer[3] > spotList[i][3])
+                            spotList[i][3] = writeBuffer[3];
+
+                        spotList[i][4] = 1;     //aliveCheck 올림
+                        flag_ditect = 1;
+                    }
+                    else
+                        flag_ditect = 0;
+                }
+
+                //기존에 없었다면 신규 생성
+                if (flag_ditect == 0)
+                {
+                    spotList.Add(new byte[5]);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        spotList[spotList.Count - 1][i] = writeBuffer[i];
+                    }
+                    spotList[spotList.Count - 1][4] = 1;    //aliveCheck 올림
+                }
+            }
+            //aliveCheck 검사
+            int count = spotList.Count;
+            for (int i = 0; i < count; i++)
+            {
+                if(spotList[count - (i + 1)][4] == 0)
+                {
+                    spotList.RemoveAt(i);
+                }
+            }
+            */
+        }
+        
+        private void ListViewUpdate()
+        {
+            listView1.BeginUpdate();
+            ListViewItem item;
+
+            int count_listview = listView1.Items.Count; // ex) 기존 : 10개 [0],[1],[2]
+            int count_spotlist = spotList.Count;        // ex) 신규 : 7개 [0],[1]
+            //Remove Spots
+            for (int i = count_spotlist; i < count_listview; i++)   // (기존 - 신규) 만큼 반복 삭제
+            {
+                listView1.Items.RemoveAt(0);   // ex) 1개 삭제
+            }
+            //Add Spots
+            for (int i = count_listview; i < count_spotlist; i++)   // (신규 - 기존) 만큼 반복 생성
+            {
+                item = new ListViewItem("No." + (i + 1));
+                item.SubItems.Add("");
+                item.SubItems.Add("");
+                listView1.Items.Add(item);
             }
 
-            if (!frame.Empty())
+            //revise Spots
+            for (int i = 0; i < count_spotlist; i++)    // 7번 반복 (신규)
             {
-                image = BitmapConverter.ToBitmap(frame_result);    //Mat 형식을 Bitmap 형식으로, Format8bppIndexed
-                
-                AverageTemp(image);                                 //평균 온도 측정
-
-                pictureBox1.Image = image;
+                listView1.Items[i].SubItems[1].Text = "(" + spotList[i][0] + ", " + spotList[i][1] + ")";
+                listView1.Items[i].SubItems[2].Text = "(" + spotList[i][2] + ", " + spotList[i][3] + ")";
             }
-            image = null;   //다시 비워줌
+            tbInfo.Text = spotList.Count + "\r\n";
+            tbInfo.AppendText(listView1.Items.Count + "");
+            listView1.EndUpdate();
         }
 
         private void SerialWrite(byte[] writeBuffer)
@@ -364,7 +397,15 @@ namespace SprinklerProject
         public Form1()
         {
             InitializeComponent();
-            InitTableSpot();
+
+            timer_spot.Interval = 1000; //1 sec
+            //timer_spot.Tick += new EventHandler(ListViewUpdate);
+
+            timer_ImgProcess.Interval = 100; // 100 milli sec
+            timer_ImgProcess.Tick += new EventHandler(ImageProcess);
+
+            timer_Setting.Interval = 300; // 100 milli sec
+            timer_Setting.Tick += new EventHandler(Setting);
 
             //var devices = Lepton.CCI.GetDevices();
             //var device = devices[0];
@@ -512,26 +553,37 @@ namespace SprinklerProject
         {
             if (btnStart.Text.Equals("Start"))
             {
-                CaptureCamera();
-                SettingsThread();
+                Init_Camera();
+                //SettingsThread();
                 btnStart.Text = "Stop";
                 isCameraRunning = 1;
+                //timer_spot.Enabled = true;
+                //timer_spot.Start();
+                timer_ImgProcess.Enabled = true;
+                timer_ImgProcess.Start();
+                timer_Setting.Enabled = true;
+                timer_Setting.Start();
                 tbInfo.AppendText("Camera 스레드, Setting 스레드 실행\r\n");
             }
             else
             {
                 if (capture.IsOpened())
                 {
-                    camera.Abort();
                     capture.Release();
                     frame.Dispose();
                     frame_gray.Dispose();
                     frame_binary.Dispose();
                     frame_result.Dispose();
-                    settings.Abort();
+                    //settings.Abort();
                     tbInfo.AppendText("Camera 스레드, Setting 스레드 종료\r\n");
                 }
 
+                timer_spot.Enabled = false;
+                timer_spot.Stop();
+                timer_ImgProcess.Enabled = false;
+                timer_ImgProcess.Stop();
+                timer_Setting.Enabled = false;
+                timer_Setting.Stop();
                 btnStart.Text = "Start";
                 isCameraRunning = 0;
             }
@@ -606,8 +658,6 @@ namespace SprinklerProject
         {
             if (capture != null)
                 capture.Release();
-            if (camera != null)
-                camera.Abort();
             if (frame != null)
             {
                 frame.Dispose();
@@ -615,8 +665,18 @@ namespace SprinklerProject
                 frame_binary.Dispose();
                 frame_result.Dispose();
             }
-            if (settings != null)
-                settings.Abort();
         }
     }
 }
+
+
+/*
+Stopwatch sw = new Stopwatch();
+sw.Start();
+sw.Stop();
+MessageBox.Show(sw.ElapsedMilliseconds.ToString() + "ms");
+*/
+/*
+ * 해야할 것
+ * Timer 오프셋 줘서 안겹치게하기
+*/
