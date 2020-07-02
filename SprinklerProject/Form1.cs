@@ -22,9 +22,8 @@ namespace SprinklerProject
     public partial class Form1 : Form
     {
         VideoCapture capture;
-        Mat frame, frame_gray, frame_binary, frame_result;
         Bitmap image;
-        int isCameraRunning = 0;
+        //int isCameraRunning = 0;
         int settingCount = 0;
         int colorMode = 0;
         Point[][] contours;
@@ -35,26 +34,6 @@ namespace SprinklerProject
         
         HierarchyIndex[] hierarchy;
         CCI.Sys.GainModeObj gainModeObj;
-        
-        private void Init_Camera()
-        {
-            frame = new Mat();
-            frame_gray = new Mat();
-            frame_binary = new Mat();
-            frame_result = new Mat();
-
-            capture = new VideoCapture();
-            capture.Open(0);
-            
-            if (!capture.IsOpened())
-            {
-                tbInfo.AppendText("카메라를 연결할 수 없습니다.\r\n");
-            }
-            else
-            {
-                tbInfo.AppendText("width : " + capture.FrameWidth + ", height : " + capture.FrameHeight + "\r\n");
-            }
-        }
 
         private void Setting(object sender, EventArgs e)
         {
@@ -142,6 +121,11 @@ namespace SprinklerProject
 
         private void ImageProcessHandler(object sender, EventArgs e)
         {
+            Mat frame = new Mat();
+            Mat frame_gray = new Mat();
+            Mat frame_binary = new Mat();
+            Mat frame_result = new Mat();
+
             try
             {
                 byte[] writeBuffer = new byte[4];
@@ -324,9 +308,120 @@ namespace SprinklerProject
                 listView1.Items[i].SubItems[1].Text = "(" + spotList[i][0] + ", " + spotList[i][1] + ")";
                 listView1.Items[i].SubItems[2].Text = "(" + spotList[i][2] + ", " + spotList[i][3] + ")";
             }
-            tbInfo.Text = spotList.Count + "\r\n";
-            tbInfo.AppendText(listView1.Items.Count + "");
+            tbInfo.Text = spotList.Count + "\r\n";              //★★★
+            tbInfo.AppendText(listView1.Items.Count + "");      //★★★
+
             listView1.EndUpdate();
+        }
+
+        private void CheckSpot(object sender, EventArgs e)
+        {
+            if (lblState.Text.Equals("Ready"))
+            {
+                if (SerialPort.IsOpen)
+                {
+                    if(listView1.Items.Count > 0)
+                    {
+                        try
+                        {
+                            byte[] packet = Packaging_DetectedSpot();
+                            SerialPort.Write(packet, 0, packet.Length); //USB : 64byte
+                            MessageBox.Show("Write : [" + packet.Length + "] bytes\r\n" + "stopbits : " + SerialPort.StopBits + "\r\nBaud rate : " + SerialPort.BaudRate);
+                        }
+                        catch (ArgumentNullException)
+                        {
+                            MessageBox.Show("Empty Argument", "System Message");
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            MessageBox.Show("COM Port was Not Opened", "System Message");
+                        }
+                        catch (TimeoutException)
+                        {
+                            MessageBox.Show("Time out! Pleasy retry", "System Message");
+                        }
+                    }
+                }
+            }
+        }
+
+        private byte[] Packaging_DetectedSpot()
+        {
+            List<byte> TXpacket = new List<byte>();
+            List<byte> readSpot = new List<byte>();
+            int checksum = 0;
+            int count = 0;      //UART Option
+            string string_temp = "";
+            string[] string_split;
+
+            TXpacket.Add(Convert.ToByte('S'));
+            TXpacket.Add(0x01); //Spot Write Command
+
+            for (int i = 0; i < listView1.Items.Count; i++)
+            {
+                string_temp = listView1.Items[i].SubItems[1].Text;
+                string_split = string_temp.Substring(1, string_temp.Length - 2).Split(',');
+                readSpot.Add(Convert.ToByte(string_split[0]));
+                readSpot.Add(Convert.ToByte(string_split[1]));
+
+                string_temp = listView1.Items[i].SubItems[2].Text;
+                string_split = string_temp.Substring(1, string_temp.Length - 2).Split(',');
+                readSpot.Add(Convert.ToByte(string_split[0]));
+                readSpot.Add(Convert.ToByte(string_split[1]));
+            }
+
+            int num = readSpot.Count;
+            byte[] readSpotArr = readSpot.ToArray();
+
+            //Check Range of Spot , checksum data
+            for (int i = 0; i < listView1.Items.Count; i++)
+            {
+                if (readSpotArr[(i * 4) + 0] > 160 || readSpotArr[(i * 4) + 1] > 120)
+                {
+                    MessageBox.Show("No." + i + " StartPoint : Out of range");
+                }
+                if (readSpotArr[(i * 4) + 2] > 160 || readSpotArr[(i * 4) + 3] > 120)
+                {
+                    MessageBox.Show("No." + i + " EndPoint : Out of range");
+                }
+
+                int buf = 0;
+
+                buf = 's';
+                checksum = checksum ^ buf;                  //checksum XOR buf
+                buf = Convert.ToInt32(readSpotArr[(i * 4) + 0]);
+                checksum = checksum ^ buf;
+                buf = Convert.ToInt32(readSpotArr[(i * 4) + 1]);
+                checksum = checksum ^ buf;
+
+                buf = 'e';
+                checksum = checksum ^ buf;
+                buf = Convert.ToInt32(readSpotArr[(i * 4) + 2]);
+                checksum = checksum ^ buf;
+                buf = Convert.ToInt32(readSpotArr[(i * 4) + 3]);
+                checksum = checksum ^ buf;
+
+                TXpacket.Add(Convert.ToByte('s'));
+                TXpacket.Add(readSpotArr[(i * 4) + 0]);
+                TXpacket.Add(readSpotArr[(i * 4) + 1]);
+                TXpacket.Add(Convert.ToByte('e'));
+                TXpacket.Add(readSpotArr[(i * 4) + 2]);
+                TXpacket.Add(readSpotArr[(i * 4) + 3]);
+            }
+            //UART Option
+            //MessageBox.Show(TXpacket.Count + "");
+            count = TXpacket.Count;
+            for (int i = 0; i < (62 - count); i++)
+            {
+                TXpacket.Add(0x00);
+            }
+
+            TXpacket.Add(Convert.ToByte(checksum));
+            TXpacket.Add(Convert.ToByte('T'));
+            byte[] TXpacketarr = TXpacket.ToArray();
+
+
+            return TXpacketarr;
         }
 
         private void SerialWrite(byte[] writeBuffer)
@@ -397,9 +492,13 @@ namespace SprinklerProject
         public Form1()
         {
             InitializeComponent();
+            
+            Tab_MAIN.Appearance = TabAppearance.Buttons;
+            Tab_MAIN.SizeMode = TabSizeMode.Fixed;
+            Tab_MAIN.ItemSize = new System.Drawing.Size(0, 1);
 
-            timer_spot.Interval = 1000; //1 sec
-            //timer_spot.Tick += new EventHandler(ListViewUpdate);
+            timer_SendSpot.Interval = 1000; //1 sec
+            timer_SendSpot.Tick += new EventHandler(CheckSpot);
 
             timer_ImgProcess.Interval = 100; // 100 milli sec
             timer_ImgProcess.Tick += new EventHandler(ImageProcess);
@@ -407,6 +506,7 @@ namespace SprinklerProject
             timer_Setting.Interval = 300; // 100 milli sec
             timer_Setting.Tick += new EventHandler(Setting);
 
+            btnStart.Enabled = false;
             //var devices = Lepton.CCI.GetDevices();
             //var device = devices[0];
             //lepton = device.Open();
@@ -475,6 +575,7 @@ namespace SprinklerProject
             */
         }
 
+
         #region CheckBox Event
         private void cbFormat_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -540,10 +641,21 @@ namespace SprinklerProject
             {
                 var devices = Lepton.CCI.GetDevices();
                 try {
-                    var device = devices[0];
-                    lepton = device.Open();
-                    btnOpen.Enabled = false;
-                    MessageBox.Show("Device Opened");
+                    
+                    for (int i = 0; i < devices.Count; i++)
+                    {
+                        if (devices[i].Name.Equals("PureThermal (fw:v1.3.0)"))
+                        {
+                            var device = devices[i];
+                            lepton = device.Open();
+                            btnOpen.Enabled = false;
+                            MessageBox.Show("Device Opened");
+                        }
+                    }
+                    if(btnOpen.Enabled == true)
+                    {
+                        MessageBox.Show("Please Check Device", "System Message");
+                    }                    
                 }
                 catch (Exception) { MessageBox.Show("Please Connect Camera"); }
             }
@@ -553,39 +665,26 @@ namespace SprinklerProject
         {
             if (btnStart.Text.Equals("Start"))
             {
-                Init_Camera();
-                //SettingsThread();
                 btnStart.Text = "Stop";
-                isCameraRunning = 1;
-                //timer_spot.Enabled = true;
-                //timer_spot.Start();
+                btnStart.BackColor = SystemColors.ActiveCaption;
+                Panel_Cam.SendToBack();
+                timer_SendSpot.Enabled = true;
+                timer_SendSpot.Start();
                 timer_ImgProcess.Enabled = true;
                 timer_ImgProcess.Start();
                 timer_Setting.Enabled = true;
                 timer_Setting.Start();
-                tbInfo.AppendText("Camera 스레드, Setting 스레드 실행\r\n");
             }
             else
             {
-                if (capture.IsOpened())
-                {
-                    capture.Release();
-                    frame.Dispose();
-                    frame_gray.Dispose();
-                    frame_binary.Dispose();
-                    frame_result.Dispose();
-                    //settings.Abort();
-                    tbInfo.AppendText("Camera 스레드, Setting 스레드 종료\r\n");
-                }
-
-                timer_spot.Enabled = false;
-                timer_spot.Stop();
+                btnStart.Text = "Start";
+                btnStart.BackColor = SystemColors.ActiveCaption;
+                timer_SendSpot.Enabled = false;
+                timer_SendSpot.Stop();
                 timer_ImgProcess.Enabled = false;
                 timer_ImgProcess.Stop();
                 timer_Setting.Enabled = false;
                 timer_Setting.Stop();
-                btnStart.Text = "Start";
-                isCameraRunning = 0;
             }
         }
 
@@ -610,8 +709,10 @@ namespace SprinklerProject
             if (Tab_MAIN.TabIndex != 0)
             {
                 Tab_MAIN.SelectedIndex = 0;
-                btnPortTab.Enabled = true;
                 btnCamTab.Enabled = false;
+                btnPortTab.Enabled = true;
+                btnCamTab.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(199)))), ((int)(((byte)(207)))));
+                btnPortTab.BackColor = SystemColors.ControlDarkDark;
             }
         }
 
@@ -620,17 +721,86 @@ namespace SprinklerProject
             if (Tab_MAIN.TabIndex != 1)
             {
                 Tab_MAIN.SelectedIndex = 1;
-                btnPortTab.Enabled = false;
                 btnCamTab.Enabled = true;
+                btnPortTab.Enabled = false;
+                btnCamTab.BackColor = SystemColors.ControlDarkDark;
+                btnPortTab.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(199)))), ((int)(((byte)(207)))));
             }
         }
 
         private void btnGetPort_Click(object sender, EventArgs e)
         {
-            String[] port = SerialPort.GetPortNames();
-            cbCom.Items.Clear();
-            cbCom.Items.AddRange(port);
+            GetAvailablePort();
         }
+
+        private void BTN_Conn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (cbCom.Text == "")
+                {
+                    MessageBox.Show("Please Select the Availabe ports", "System Message");
+                }
+                else
+                {
+                    try
+                    {
+                        SerialPort.PortName = cbCom.Text;
+                        SerialPort.BaudRate = 115200;
+                        SerialPort.StopBits = StopBits.One;
+
+                        //SerialPort.DataReceived += new SerialDataReceivedEventHandler(Serial_DataReceived);
+                        SerialPort.Open();
+
+                        if (SerialPort.IsOpen)
+                        {
+                            TB_Com.Text = cbCom.Text;
+                            BTN_Conn_Com.Enabled = false;
+                            BTN_Disconn_Com.Enabled = true;
+
+                            cbCom.Enabled = false;
+
+                            //pictureBox_OFF.Visible = false;
+                            //pictureBox_ON.Visible = true;
+                            MessageBox.Show("COM Port Open", "System Message");
+
+                            //timer_wtdg.Enabled = true;
+                            //timer_wtdg.Start();
+                        }
+                    }
+                    catch (System.IO.IOException ex)
+                    {
+                        MessageBox.Show("Error: " + ex.ToString(), "ERROR");
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("Un authorized Access!!");
+            }
+        }
+
+        private void BTN_Disconn_Click(object sender, EventArgs e)
+        {
+            if (SerialPort.IsOpen)
+            {
+                SerialPort.DiscardInBuffer();
+                SerialPort.DiscardOutBuffer();
+                SerialPort.Close();
+
+                if (!SerialPort.IsOpen)
+                {
+                    BTN_Conn_Com.Enabled = true;
+                    BTN_Disconn_Com.Enabled = false;
+
+                    cbCom.Enabled = true;
+
+                    MessageBox.Show("COM Port Closed", "System Message");
+                }
+                GetAvailablePort();
+            }
+        }
+
         #endregion
 
         #region RadioButton Event
@@ -646,6 +816,79 @@ namespace SprinklerProject
                 colorMode = 0;
         }
 
+        private void BTN_Conn_Cam_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (cbCam.Text == "")
+                {
+                    MessageBox.Show("Please Select the Availabe cam", "System Message");
+                }
+                else
+                {
+                    try
+                    {
+                        capture.Open(Convert.ToInt32(cbCam.Text));
+                        if (capture.IsOpened())
+                        {
+                            btnStart.Enabled = true;
+                            TB_CAM.Text = cbCam.Text;
+                            BTN_Conn_Cam.Enabled = false;
+                            BTN_Disconn_Cam.Enabled = true;
+
+                            cbCam.Enabled = false;
+                            
+                            MessageBox.Show("CAM Open", "System Message");
+                        }
+                    }
+                    catch (System.IO.IOException ex)
+                    {
+                        MessageBox.Show("Error: " + ex.ToString(), "ERROR");
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("Un authorized Access!!");
+            }
+        }
+
+        private void btnGetCam_Click(object sender, EventArgs e)
+        {
+            GetAvailableCam();
+        }
+
+        private void BTN_Disconn_Cam_Click(object sender, EventArgs e)
+        {
+            if (capture.IsOpened())
+            {
+                capture.Release();
+                btnStart.Enabled = false;
+
+                if (!capture.IsOpened())
+                {
+                    BTN_Conn_Cam.Enabled = true;
+                    BTN_Disconn_Cam.Enabled = false;
+
+                    cbCam.Enabled = true;
+
+                    MessageBox.Show("CAM Closed", "System Message");
+                }
+                GetAvailablePort();
+            }
+
+            if (btnStart.Text.Equals("Stop"))
+            {
+                timer_SendSpot.Enabled = false;
+                timer_SendSpot.Stop();
+                timer_ImgProcess.Enabled = false;
+                timer_ImgProcess.Stop();
+                timer_Setting.Enabled = false;
+                timer_Setting.Stop();
+                btnStart.Text = "Start";
+            }
+        }
+
         private void rbtnBinary_CheckedChanged(object sender, EventArgs e)
         {
             if (rbtnBinary.Checked)
@@ -658,6 +901,7 @@ namespace SprinklerProject
         {
             if (capture != null)
                 capture.Release();
+            /*
             if (frame != null)
             {
                 frame.Dispose();
@@ -665,6 +909,44 @@ namespace SprinklerProject
                 frame_binary.Dispose();
                 frame_result.Dispose();
             }
+            */
+        }
+
+        private void GetAvailablePort()
+        {
+            String[] port = SerialPort.GetPortNames();
+            cbCom.Items.Clear();
+            cbCom.Items.AddRange(port);
+        }
+
+        private void GetAvailableCam()
+        {
+            int device_count = 0;
+            List<String> cam_list = new List<String>();
+
+            capture = new VideoCapture();
+
+            while (true)
+            {
+                if (capture.Open(device_count))       //확인 필수
+                {
+                    cam_list.Add(Convert.ToString(device_count));
+                }
+                capture.Release();
+                device_count++;
+
+                if (device_count == 10)
+                {
+                    if (cam_list.Count == 0)
+                        MessageBox.Show("Please Check Camera", "System Message");
+                    break;
+                }
+            }
+            String[] cam;
+            cam = cam_list.ToArray();
+
+            cbCam.Items.Clear();
+            cbCam.Items.AddRange(cam);
         }
     }
 }
