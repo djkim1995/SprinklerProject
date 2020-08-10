@@ -1,6 +1,6 @@
 ﻿namespace SprinklerProject
 {
-    partial class Form1
+    partial class Sprinkler
     {
         /// <summary>
         /// 필수 디자이너 변수입니다.
@@ -29,15 +29,14 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Sprinkler));
             this.btnStart = new System.Windows.Forms.Button();
             this.tbInfo = new System.Windows.Forms.TextBox();
-            this.rbtnGrayScale = new System.Windows.Forms.RadioButton();
+            this.rbtnGray = new System.Windows.Forms.RadioButton();
             this.rbtnRGB = new System.Windows.Forms.RadioButton();
             this.rbtnBinary = new System.Windows.Forms.RadioButton();
             this.gbSettings = new System.Windows.Forms.GroupBox();
-            this.cbHotColor = new System.Windows.Forms.ComboBox();
-            this.lblHotColor = new System.Windows.Forms.Label();
+            this.BTN_GET_SETTING = new System.Windows.Forms.Button();
             this.cbTLinearEnable = new System.Windows.Forms.ComboBox();
             this.lblTLinearEnable = new System.Windows.Forms.Label();
             this.cbRadEnable = new System.Windows.Forms.ComboBox();
@@ -62,14 +61,27 @@
             this.SerialPort = new System.IO.Ports.SerialPort(this.components);
             this.Tab_MAIN = new System.Windows.Forms.TabControl();
             this.camPage = new System.Windows.Forms.TabPage();
+            this.Panel_Cam = new System.Windows.Forms.Panel();
             this.btnOpen = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.BTN_RESET_STATE = new System.Windows.Forms.Button();
+            this.Panel_Icon = new System.Windows.Forms.Panel();
+            this.PictureBox_Icon = new System.Windows.Forms.PictureBox();
             this.lblState = new System.Windows.Forms.Label();
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.portPage = new System.Windows.Forms.TabPage();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.TB_Com_MCU = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cbCom_MCU = new System.Windows.Forms.ComboBox();
+            this.BTN_Disconn_Com_MCU = new System.Windows.Forms.Button();
+            this.btnGetPort_MCU = new System.Windows.Forms.Button();
+            this.BTN_Conn_Com_MCU = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.LB_Conn_Cam = new System.Windows.Forms.Label();
             this.TB_CAM = new System.Windows.Forms.TextBox();
@@ -95,28 +107,44 @@
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.Panel_Line = new System.Windows.Forms.Panel();
             this.Panel_box = new System.Windows.Forms.Panel();
-            this.Panel_Cam = new System.Windows.Forms.Panel();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.PB_FIRE = new System.Windows.Forms.PictureBox();
+            this.LB_FIRE_STATE = new System.Windows.Forms.Label();
+            this.PB_Port_OFF_MCU = new System.Windows.Forms.PictureBox();
+            this.LB_PortSTATE_MCU = new System.Windows.Forms.Label();
+            this.btn_setting = new System.Windows.Forms.Button();
+            this.btnFormat = new System.Windows.Forms.Button();
+            this.PB_Port_OFF = new System.Windows.Forms.PictureBox();
+            this.PB_Cam_OFF = new System.Windows.Forms.PictureBox();
+            this.PB_Port_ON = new System.Windows.Forms.PictureBox();
+            this.LB_PortSTATE = new System.Windows.Forms.Label();
+            this.PB_Cam_ON = new System.Windows.Forms.PictureBox();
+            this.LB_CAMSTATE = new System.Windows.Forms.Label();
+            this.PictureBox_logo = new System.Windows.Forms.PictureBox();
+            this.PB_Port_ON_MCU = new System.Windows.Forms.PictureBox();
+            this.SerialPort_MCU = new System.IO.Ports.SerialPort(this.components);
             this.gbSettings.SuspendLayout();
             this.gbTemperature.SuspendLayout();
             this.Tab_MAIN.SuspendLayout();
             this.camPage.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.Panel_Icon.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Icon)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.portPage.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.Panel_Tabcontrol.SuspendLayout();
             this.Panel_box.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_FIRE)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Port_OFF_MCU)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Port_OFF)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Cam_OFF)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Port_ON)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Cam_ON)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_logo)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Port_ON_MCU)).BeginInit();
             this.SuspendLayout();
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Location = new System.Drawing.Point(208, 29);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(640, 488);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
             // 
             // btnStart
             // 
@@ -130,7 +158,7 @@
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(94, 60);
             this.btnStart.TabIndex = 1;
-            this.btnStart.Text = "Start";
+            this.btnStart.Text = "START";
             this.btnStart.UseVisualStyleBackColor = false;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
@@ -146,24 +174,24 @@
             this.tbInfo.Size = new System.Drawing.Size(196, 102);
             this.tbInfo.TabIndex = 2;
             // 
-            // rbtnGrayScale
+            // rbtnGray
             // 
-            this.rbtnGrayScale.AutoSize = true;
-            this.rbtnGrayScale.Checked = true;
-            this.rbtnGrayScale.Location = new System.Drawing.Point(14, 425);
-            this.rbtnGrayScale.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.rbtnGrayScale.Name = "rbtnGrayScale";
-            this.rbtnGrayScale.Size = new System.Drawing.Size(77, 19);
-            this.rbtnGrayScale.TabIndex = 6;
-            this.rbtnGrayScale.TabStop = true;
-            this.rbtnGrayScale.Text = "GrayScale";
-            this.rbtnGrayScale.UseVisualStyleBackColor = true;
-            this.rbtnGrayScale.CheckedChanged += new System.EventHandler(this.rbtnGrayScale_CheckedChanged);
+            this.rbtnGray.AutoSize = true;
+            this.rbtnGray.Checked = true;
+            this.rbtnGray.Location = new System.Drawing.Point(14, 425);
+            this.rbtnGray.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.rbtnGray.Name = "rbtnGray";
+            this.rbtnGray.Size = new System.Drawing.Size(49, 19);
+            this.rbtnGray.TabIndex = 6;
+            this.rbtnGray.TabStop = true;
+            this.rbtnGray.Text = "Gray";
+            this.rbtnGray.UseVisualStyleBackColor = true;
+            this.rbtnGray.CheckedChanged += new System.EventHandler(this.rbtnGrayScale_CheckedChanged);
             // 
             // rbtnRGB
             // 
             this.rbtnRGB.AutoSize = true;
-            this.rbtnRGB.Location = new System.Drawing.Point(116, 425);
+            this.rbtnRGB.Location = new System.Drawing.Point(149, 425);
             this.rbtnRGB.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rbtnRGB.Name = "rbtnRGB";
             this.rbtnRGB.Size = new System.Drawing.Size(47, 19);
@@ -175,20 +203,19 @@
             // rbtnBinary
             // 
             this.rbtnBinary.AutoSize = true;
-            this.rbtnBinary.Location = new System.Drawing.Point(14, 398);
+            this.rbtnBinary.Location = new System.Drawing.Point(75, 425);
             this.rbtnBinary.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.rbtnBinary.Name = "rbtnBinary";
-            this.rbtnBinary.Size = new System.Drawing.Size(86, 19);
+            this.rbtnBinary.Size = new System.Drawing.Size(58, 19);
             this.rbtnBinary.TabIndex = 8;
-            this.rbtnBinary.Text = "BinaryScale";
+            this.rbtnBinary.Text = "Binary";
             this.rbtnBinary.UseVisualStyleBackColor = true;
             this.rbtnBinary.CheckedChanged += new System.EventHandler(this.rbtnBinary_CheckedChanged);
             // 
             // gbSettings
             // 
             this.gbSettings.BackColor = System.Drawing.Color.White;
-            this.gbSettings.Controls.Add(this.cbHotColor);
-            this.gbSettings.Controls.Add(this.lblHotColor);
+            this.gbSettings.Controls.Add(this.BTN_GET_SETTING);
             this.gbSettings.Controls.Add(this.cbTLinearEnable);
             this.gbSettings.Controls.Add(this.lblTLinearEnable);
             this.gbSettings.Controls.Add(this.cbRadEnable);
@@ -205,32 +232,27 @@
             this.gbSettings.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gbSettings.Name = "gbSettings";
             this.gbSettings.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gbSettings.Size = new System.Drawing.Size(196, 251);
+            this.gbSettings.Size = new System.Drawing.Size(196, 286);
             this.gbSettings.TabIndex = 9;
             this.gbSettings.TabStop = false;
             this.gbSettings.Text = "Settings";
             // 
-            // cbHotColor
+            // BTN_GET_SETTING
             // 
-            this.cbHotColor.FormattingEnabled = true;
-            this.cbHotColor.Items.AddRange(new object[] {
-            "BLACK",
-            "WHITE"});
-            this.cbHotColor.Location = new System.Drawing.Point(106, 220);
-            this.cbHotColor.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.cbHotColor.Name = "cbHotColor";
-            this.cbHotColor.Size = new System.Drawing.Size(84, 23);
-            this.cbHotColor.TabIndex = 13;
-            this.cbHotColor.SelectedIndexChanged += new System.EventHandler(this.cbHotColor_SelectedIndexChanged);
-            // 
-            // lblHotColor
-            // 
-            this.lblHotColor.AutoSize = true;
-            this.lblHotColor.Location = new System.Drawing.Point(8, 224);
-            this.lblHotColor.Name = "lblHotColor";
-            this.lblHotColor.Size = new System.Drawing.Size(56, 15);
-            this.lblHotColor.TabIndex = 12;
-            this.lblHotColor.Text = "HotColor";
+            this.BTN_GET_SETTING.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.BTN_GET_SETTING.Enabled = false;
+            this.BTN_GET_SETTING.FlatAppearance.BorderSize = 0;
+            this.BTN_GET_SETTING.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BTN_GET_SETTING.Font = new System.Drawing.Font("맑은 고딕", 14F, System.Drawing.FontStyle.Bold);
+            this.BTN_GET_SETTING.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.BTN_GET_SETTING.Location = new System.Drawing.Point(8, 229);
+            this.BTN_GET_SETTING.Margin = new System.Windows.Forms.Padding(0);
+            this.BTN_GET_SETTING.Name = "BTN_GET_SETTING";
+            this.BTN_GET_SETTING.Size = new System.Drawing.Size(182, 39);
+            this.BTN_GET_SETTING.TabIndex = 19;
+            this.BTN_GET_SETTING.Text = "GET SETTING";
+            this.BTN_GET_SETTING.UseVisualStyleBackColor = false;
+            this.BTN_GET_SETTING.Click += new System.EventHandler(this.BTN_GET_SETTING_Click);
             // 
             // cbTLinearEnable
             // 
@@ -366,13 +388,14 @@
             // 
             // btnGainModeObj
             // 
-            this.btnGainModeObj.Location = new System.Drawing.Point(12, 432);
+            this.btnGainModeObj.Location = new System.Drawing.Point(18, 506);
             this.btnGainModeObj.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnGainModeObj.Name = "btnGainModeObj";
-            this.btnGainModeObj.Size = new System.Drawing.Size(111, 60);
+            this.btnGainModeObj.Size = new System.Drawing.Size(108, 31);
             this.btnGainModeObj.TabIndex = 10;
             this.btnGainModeObj.Text = "GainModeObj";
             this.btnGainModeObj.UseVisualStyleBackColor = true;
+            this.btnGainModeObj.Visible = false;
             this.btnGainModeObj.Click += new System.EventHandler(this.btnGainModeObj_Click);
             // 
             // gbTemperature
@@ -388,25 +411,25 @@
             this.gbTemperature.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.gbTemperature.Name = "gbTemperature";
             this.gbTemperature.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.gbTemperature.Size = new System.Drawing.Size(316, 81);
+            this.gbTemperature.Size = new System.Drawing.Size(232, 81);
             this.gbTemperature.TabIndex = 11;
             this.gbTemperature.TabStop = false;
             this.gbTemperature.Text = "Temperature(0~255)";
             // 
             // tbMaxTemp
             // 
-            this.tbMaxTemp.Location = new System.Drawing.Point(230, 41);
+            this.tbMaxTemp.Location = new System.Drawing.Point(157, 41);
             this.tbMaxTemp.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tbMaxTemp.Name = "tbMaxTemp";
-            this.tbMaxTemp.Size = new System.Drawing.Size(80, 23);
+            this.tbMaxTemp.Size = new System.Drawing.Size(50, 23);
             this.tbMaxTemp.TabIndex = 15;
             // 
             // tbAvgTemp
             // 
-            this.tbAvgTemp.Location = new System.Drawing.Point(120, 41);
+            this.tbAvgTemp.Location = new System.Drawing.Point(82, 41);
             this.tbAvgTemp.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tbAvgTemp.Name = "tbAvgTemp";
-            this.tbAvgTemp.Size = new System.Drawing.Size(80, 23);
+            this.tbAvgTemp.Size = new System.Drawing.Size(50, 23);
             this.tbAvgTemp.TabIndex = 14;
             // 
             // tbMinTemp
@@ -414,13 +437,13 @@
             this.tbMinTemp.Location = new System.Drawing.Point(7, 41);
             this.tbMinTemp.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tbMinTemp.Name = "tbMinTemp";
-            this.tbMinTemp.Size = new System.Drawing.Size(80, 23);
+            this.tbMinTemp.Size = new System.Drawing.Size(50, 23);
             this.tbMinTemp.TabIndex = 13;
             // 
             // lblMaxTemp
             // 
             this.lblMaxTemp.AutoSize = true;
-            this.lblMaxTemp.Location = new System.Drawing.Point(227, 21);
+            this.lblMaxTemp.Location = new System.Drawing.Point(154, 21);
             this.lblMaxTemp.Name = "lblMaxTemp";
             this.lblMaxTemp.Size = new System.Drawing.Size(30, 15);
             this.lblMaxTemp.TabIndex = 12;
@@ -429,7 +452,7 @@
             // lblAvgTemp
             // 
             this.lblAvgTemp.AutoSize = true;
-            this.lblAvgTemp.Location = new System.Drawing.Point(118, 21);
+            this.lblAvgTemp.Location = new System.Drawing.Point(80, 21);
             this.lblAvgTemp.Name = "lblAvgTemp";
             this.lblAvgTemp.Size = new System.Drawing.Size(50, 15);
             this.lblAvgTemp.TabIndex = 1;
@@ -453,7 +476,7 @@
             this.Tab_MAIN.Margin = new System.Windows.Forms.Padding(0);
             this.Tab_MAIN.Name = "Tab_MAIN";
             this.Tab_MAIN.SelectedIndex = 0;
-            this.Tab_MAIN.Size = new System.Drawing.Size(1200, 550);
+            this.Tab_MAIN.Size = new System.Drawing.Size(1100, 550);
             this.Tab_MAIN.TabIndex = 12;
             // 
             // camPage
@@ -465,7 +488,7 @@
             this.camPage.Controls.Add(this.tbInfo);
             this.camPage.Controls.Add(this.gbTemperature);
             this.camPage.Controls.Add(this.btnStart);
-            this.camPage.Controls.Add(this.rbtnGrayScale);
+            this.camPage.Controls.Add(this.rbtnGray);
             this.camPage.Controls.Add(this.gbSettings);
             this.camPage.Controls.Add(this.pictureBox1);
             this.camPage.Controls.Add(this.rbtnRGB);
@@ -473,52 +496,99 @@
             this.camPage.Location = new System.Drawing.Point(4, 24);
             this.camPage.Margin = new System.Windows.Forms.Padding(0);
             this.camPage.Name = "camPage";
-            this.camPage.Size = new System.Drawing.Size(1192, 522);
+            this.camPage.Size = new System.Drawing.Size(1092, 522);
             this.camPage.TabIndex = 1;
             this.camPage.Text = "Camera";
             // 
+            // Panel_Cam
+            // 
+            this.Panel_Cam.BackColor = System.Drawing.SystemColors.Control;
+            this.Panel_Cam.Location = new System.Drawing.Point(208, 29);
+            this.Panel_Cam.Name = "Panel_Cam";
+            this.Panel_Cam.Size = new System.Drawing.Size(640, 488);
+            this.Panel_Cam.TabIndex = 18;
+            // 
             // btnOpen
             // 
-            this.btnOpen.BackColor = System.Drawing.Color.MediumTurquoise;
+            this.btnOpen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(223)))), ((int)(((byte)(198)))), ((int)(((byte)(204)))));
             this.btnOpen.FlatAppearance.BorderSize = 0;
             this.btnOpen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnOpen.Font = new System.Drawing.Font("맑은 고딕", 11F, System.Drawing.FontStyle.Bold);
+            this.btnOpen.Font = new System.Drawing.Font("맑은 고딕", 14F, System.Drawing.FontStyle.Bold);
             this.btnOpen.ForeColor = System.Drawing.Color.White;
             this.btnOpen.Location = new System.Drawing.Point(7, 457);
             this.btnOpen.Margin = new System.Windows.Forms.Padding(0);
             this.btnOpen.Name = "btnOpen";
             this.btnOpen.Size = new System.Drawing.Size(94, 60);
             this.btnOpen.TabIndex = 17;
-            this.btnOpen.Text = "Open";
+            this.btnOpen.Text = "OPEN";
             this.btnOpen.UseVisualStyleBackColor = false;
             this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.lblState);
+            this.groupBox1.Controls.Add(this.BTN_RESET_STATE);
+            this.groupBox1.Controls.Add(this.Panel_Icon);
             this.groupBox1.Controls.Add(this.listView1);
             this.groupBox1.Location = new System.Drawing.Point(854, 118);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.groupBox1.Size = new System.Drawing.Size(316, 399);
+            this.groupBox1.Size = new System.Drawing.Size(232, 399);
             this.groupBox1.TabIndex = 16;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Location";
             // 
+            // BTN_RESET_STATE
+            // 
+            this.BTN_RESET_STATE.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.BTN_RESET_STATE.FlatAppearance.BorderSize = 0;
+            this.BTN_RESET_STATE.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BTN_RESET_STATE.Font = new System.Drawing.Font("맑은 고딕", 14F, System.Drawing.FontStyle.Bold);
+            this.BTN_RESET_STATE.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.BTN_RESET_STATE.Location = new System.Drawing.Point(6, 346);
+            this.BTN_RESET_STATE.Margin = new System.Windows.Forms.Padding(0);
+            this.BTN_RESET_STATE.Name = "BTN_RESET_STATE";
+            this.BTN_RESET_STATE.Size = new System.Drawing.Size(220, 46);
+            this.BTN_RESET_STATE.TabIndex = 19;
+            this.BTN_RESET_STATE.Text = "RESET";
+            this.BTN_RESET_STATE.UseVisualStyleBackColor = false;
+            this.BTN_RESET_STATE.Click += new System.EventHandler(this.BTN_RESET_STATE_Click);
+            // 
+            // Panel_Icon
+            // 
+            this.Panel_Icon.BackColor = System.Drawing.Color.White;
+            this.Panel_Icon.Controls.Add(this.PictureBox_Icon);
+            this.Panel_Icon.Controls.Add(this.lblState);
+            this.Panel_Icon.Location = new System.Drawing.Point(6, 250);
+            this.Panel_Icon.Name = "Panel_Icon";
+            this.Panel_Icon.Size = new System.Drawing.Size(220, 93);
+            this.Panel_Icon.TabIndex = 1;
+            // 
+            // PictureBox_Icon
+            // 
+            this.PictureBox_Icon.BackColor = System.Drawing.Color.Transparent;
+            this.PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_ready;
+            this.PictureBox_Icon.InitialImage = global::SprinklerProject.Properties.Resources.icon_ready;
+            this.PictureBox_Icon.Location = new System.Drawing.Point(151, 16);
+            this.PictureBox_Icon.Name = "PictureBox_Icon";
+            this.PictureBox_Icon.Size = new System.Drawing.Size(60, 60);
+            this.PictureBox_Icon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.PictureBox_Icon.TabIndex = 2;
+            this.PictureBox_Icon.TabStop = false;
+            // 
             // lblState
             // 
-            this.lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(8)))), ((int)(((byte)(169)))), ((int)(((byte)(222)))));
+            this.lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
             this.lblState.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.lblState.Font = new System.Drawing.Font("Consolas", 36F, System.Drawing.FontStyle.Bold);
-            this.lblState.ForeColor = System.Drawing.Color.White;
-            this.lblState.Location = new System.Drawing.Point(6, 295);
+            this.lblState.Font = new System.Drawing.Font("Consolas", 24F, System.Drawing.FontStyle.Bold);
+            this.lblState.ForeColor = System.Drawing.Color.Black;
+            this.lblState.Location = new System.Drawing.Point(0, 0);
             this.lblState.Margin = new System.Windows.Forms.Padding(0);
             this.lblState.Name = "lblState";
             this.lblState.Padding = new System.Windows.Forms.Padding(5, 6, 5, 6);
-            this.lblState.Size = new System.Drawing.Size(304, 100);
+            this.lblState.Size = new System.Drawing.Size(220, 93);
             this.lblState.TabIndex = 1;
-            this.lblState.Text = " Ready";
+            this.lblState.Text = "READY";
             this.lblState.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // listView1
@@ -532,7 +602,7 @@
             this.listView1.Location = new System.Drawing.Point(6, 25);
             this.listView1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(304, 266);
+            this.listView1.Size = new System.Drawing.Size(220, 218);
             this.listView1.TabIndex = 0;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -544,24 +614,133 @@
             // columnHeader2
             // 
             this.columnHeader2.Text = "Start";
-            this.columnHeader2.Width = 120;
+            this.columnHeader2.Width = 80;
             // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "End";
-            this.columnHeader3.Width = 120;
+            this.columnHeader3.Width = 80;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(208, 29);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(640, 488);
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
             // 
             // portPage
             // 
             this.portPage.BackColor = System.Drawing.Color.White;
+            this.portPage.Controls.Add(this.groupBox4);
             this.portPage.Controls.Add(this.groupBox3);
             this.portPage.Controls.Add(this.groupBox2);
             this.portPage.Location = new System.Drawing.Point(4, 24);
             this.portPage.Margin = new System.Windows.Forms.Padding(0);
             this.portPage.Name = "portPage";
-            this.portPage.Size = new System.Drawing.Size(1192, 572);
+            this.portPage.Size = new System.Drawing.Size(1092, 522);
             this.portPage.TabIndex = 0;
             this.portPage.Text = "Port";
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.label1);
+            this.groupBox4.Controls.Add(this.TB_Com_MCU);
+            this.groupBox4.Controls.Add(this.label2);
+            this.groupBox4.Controls.Add(this.cbCom_MCU);
+            this.groupBox4.Controls.Add(this.BTN_Disconn_Com_MCU);
+            this.groupBox4.Controls.Add(this.btnGetPort_MCU);
+            this.groupBox4.Controls.Add(this.BTN_Conn_Com_MCU);
+            this.groupBox4.Location = new System.Drawing.Point(352, 32);
+            this.groupBox4.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.groupBox4.Size = new System.Drawing.Size(292, 171);
+            this.groupBox4.TabIndex = 13;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "MCU PORT";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 25);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(76, 15);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "Connected : ";
+            // 
+            // TB_Com_MCU
+            // 
+            this.TB_Com_MCU.Location = new System.Drawing.Point(83, 21);
+            this.TB_Com_MCU.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.TB_Com_MCU.Name = "TB_Com_MCU";
+            this.TB_Com_MCU.ReadOnly = true;
+            this.TB_Com_MCU.Size = new System.Drawing.Size(100, 23);
+            this.TB_Com_MCU.TabIndex = 11;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 62);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(68, 15);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "COM PORT";
+            // 
+            // cbCom_MCU
+            // 
+            this.cbCom_MCU.FormattingEnabled = true;
+            this.cbCom_MCU.Location = new System.Drawing.Point(83, 59);
+            this.cbCom_MCU.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.cbCom_MCU.Name = "cbCom_MCU";
+            this.cbCom_MCU.Size = new System.Drawing.Size(121, 23);
+            this.cbCom_MCU.TabIndex = 1;
+            // 
+            // BTN_Disconn_Com_MCU
+            // 
+            this.BTN_Disconn_Com_MCU.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(214)))), ((int)(((byte)(198)))), ((int)(((byte)(195)))));
+            this.BTN_Disconn_Com_MCU.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BTN_Disconn_Com_MCU.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold);
+            this.BTN_Disconn_Com_MCU.ForeColor = System.Drawing.Color.White;
+            this.BTN_Disconn_Com_MCU.Location = new System.Drawing.Point(159, 101);
+            this.BTN_Disconn_Com_MCU.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.BTN_Disconn_Com_MCU.Name = "BTN_Disconn_Com_MCU";
+            this.BTN_Disconn_Com_MCU.Size = new System.Drawing.Size(126, 56);
+            this.BTN_Disconn_Com_MCU.TabIndex = 9;
+            this.BTN_Disconn_Com_MCU.Text = "Disconnect";
+            this.BTN_Disconn_Com_MCU.UseVisualStyleBackColor = true;
+            this.BTN_Disconn_Com_MCU.Click += new System.EventHandler(this.BTN_Disconn_Com_MCU_Click);
+            // 
+            // btnGetPort_MCU
+            // 
+            this.btnGetPort_MCU.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnGetPort_MCU.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnGetPort_MCU.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.btnGetPort_MCU.ForeColor = System.Drawing.Color.White;
+            this.btnGetPort_MCU.Location = new System.Drawing.Point(210, 51);
+            this.btnGetPort_MCU.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnGetPort_MCU.Name = "btnGetPort_MCU";
+            this.btnGetPort_MCU.Size = new System.Drawing.Size(75, 38);
+            this.btnGetPort_MCU.TabIndex = 2;
+            this.btnGetPort_MCU.Text = "Get Port";
+            this.btnGetPort_MCU.UseVisualStyleBackColor = false;
+            this.btnGetPort_MCU.Click += new System.EventHandler(this.btnGetPort_MCU_Click);
+            // 
+            // BTN_Conn_Com_MCU
+            // 
+            this.BTN_Conn_Com_MCU.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(199)))), ((int)(((byte)(207)))));
+            this.BTN_Conn_Com_MCU.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BTN_Conn_Com_MCU.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold);
+            this.BTN_Conn_Com_MCU.ForeColor = System.Drawing.Color.White;
+            this.BTN_Conn_Com_MCU.Location = new System.Drawing.Point(8, 101);
+            this.BTN_Conn_Com_MCU.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.BTN_Conn_Com_MCU.Name = "BTN_Conn_Com_MCU";
+            this.BTN_Conn_Com_MCU.Size = new System.Drawing.Size(126, 56);
+            this.BTN_Conn_Com_MCU.TabIndex = 8;
+            this.BTN_Conn_Com_MCU.Text = "Connect";
+            this.BTN_Conn_Com_MCU.UseVisualStyleBackColor = false;
+            this.BTN_Conn_Com_MCU.Click += new System.EventHandler(this.BTN_Conn_Com_MCU_Click);
             // 
             // groupBox3
             // 
@@ -768,7 +947,7 @@
             this.btnPortTab.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPortTab.Font = new System.Drawing.Font("맑은 고딕", 14F, System.Drawing.FontStyle.Bold);
             this.btnPortTab.ForeColor = System.Drawing.Color.White;
-            this.btnPortTab.Location = new System.Drawing.Point(0, 246);
+            this.btnPortTab.Location = new System.Drawing.Point(0, 175);
             this.btnPortTab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnPortTab.Name = "btnPortTab";
             this.btnPortTab.Size = new System.Drawing.Size(126, 100);
@@ -785,7 +964,7 @@
             this.btnCamTab.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCamTab.Font = new System.Drawing.Font("맑은 고딕", 14F, System.Drawing.FontStyle.Bold);
             this.btnCamTab.ForeColor = System.Drawing.Color.White;
-            this.btnCamTab.Location = new System.Drawing.Point(0, 146);
+            this.btnCamTab.Location = new System.Drawing.Point(0, 75);
             this.btnCamTab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnCamTab.Name = "btnCamTab";
             this.btnCamTab.Size = new System.Drawing.Size(126, 100);
@@ -800,7 +979,7 @@
             this.Panel_Tabcontrol.Location = new System.Drawing.Point(126, -5);
             this.Panel_Tabcontrol.Margin = new System.Windows.Forms.Padding(0);
             this.Panel_Tabcontrol.Name = "Panel_Tabcontrol";
-            this.Panel_Tabcontrol.Size = new System.Drawing.Size(1200, 550);
+            this.Panel_Tabcontrol.Size = new System.Drawing.Size(1100, 550);
             this.Panel_Tabcontrol.TabIndex = 15;
             // 
             // timer_SendSpot
@@ -818,26 +997,178 @@
             // Panel_box
             // 
             this.Panel_box.BackColor = System.Drawing.SystemColors.Control;
+            this.Panel_box.Controls.Add(this.PB_FIRE);
+            this.Panel_box.Controls.Add(this.LB_FIRE_STATE);
+            this.Panel_box.Controls.Add(this.PB_Port_OFF_MCU);
+            this.Panel_box.Controls.Add(this.LB_PortSTATE_MCU);
+            this.Panel_box.Controls.Add(this.btn_setting);
+            this.Panel_box.Controls.Add(this.btnFormat);
+            this.Panel_box.Controls.Add(this.PB_Port_OFF);
+            this.Panel_box.Controls.Add(this.PB_Cam_OFF);
+            this.Panel_box.Controls.Add(this.PB_Port_ON);
+            this.Panel_box.Controls.Add(this.LB_PortSTATE);
+            this.Panel_box.Controls.Add(this.PB_Cam_ON);
+            this.Panel_box.Controls.Add(this.LB_CAMSTATE);
+            this.Panel_box.Controls.Add(this.PictureBox_logo);
             this.Panel_box.Controls.Add(this.btnGainModeObj);
+            this.Panel_box.Controls.Add(this.PB_Port_ON_MCU);
             this.Panel_box.Location = new System.Drawing.Point(0, 0);
             this.Panel_box.Name = "Panel_box";
             this.Panel_box.Size = new System.Drawing.Size(126, 545);
             this.Panel_box.TabIndex = 17;
             // 
-            // Panel_Cam
+            // PB_FIRE
             // 
-            this.Panel_Cam.BackColor = System.Drawing.SystemColors.Control;
-            this.Panel_Cam.Location = new System.Drawing.Point(208, 29);
-            this.Panel_Cam.Name = "Panel_Cam";
-            this.Panel_Cam.Size = new System.Drawing.Size(640, 488);
-            this.Panel_Cam.TabIndex = 18;
+            this.PB_FIRE.Image = global::SprinklerProject.Properties.Resources.Flame;
+            this.PB_FIRE.Location = new System.Drawing.Point(45, 428);
+            this.PB_FIRE.Name = "PB_FIRE";
+            this.PB_FIRE.Size = new System.Drawing.Size(78, 48);
+            this.PB_FIRE.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PB_FIRE.TabIndex = 33;
+            this.PB_FIRE.TabStop = false;
+            this.PB_FIRE.Visible = false;
             // 
-            // Form1
+            // LB_FIRE_STATE
+            // 
+            this.LB_FIRE_STATE.AutoSize = true;
+            this.LB_FIRE_STATE.Font = new System.Drawing.Font("맑은 고딕", 12F);
+            this.LB_FIRE_STATE.Location = new System.Drawing.Point(4, 442);
+            this.LB_FIRE_STATE.Name = "LB_FIRE_STATE";
+            this.LB_FIRE_STATE.Size = new System.Drawing.Size(37, 21);
+            this.LB_FIRE_STATE.TabIndex = 32;
+            this.LB_FIRE_STATE.Text = "Fire";
+            // 
+            // PB_Port_OFF_MCU
+            // 
+            this.PB_Port_OFF_MCU.Image = global::SprinklerProject.Properties.Resources.Switch_off;
+            this.PB_Port_OFF_MCU.Location = new System.Drawing.Point(45, 380);
+            this.PB_Port_OFF_MCU.Name = "PB_Port_OFF_MCU";
+            this.PB_Port_OFF_MCU.Size = new System.Drawing.Size(78, 48);
+            this.PB_Port_OFF_MCU.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PB_Port_OFF_MCU.TabIndex = 30;
+            this.PB_Port_OFF_MCU.TabStop = false;
+            // 
+            // LB_PortSTATE_MCU
+            // 
+            this.LB_PortSTATE_MCU.AutoSize = true;
+            this.LB_PortSTATE_MCU.Font = new System.Drawing.Font("맑은 고딕", 12F);
+            this.LB_PortSTATE_MCU.Location = new System.Drawing.Point(4, 394);
+            this.LB_PortSTATE_MCU.Name = "LB_PortSTATE_MCU";
+            this.LB_PortSTATE_MCU.Size = new System.Drawing.Size(41, 21);
+            this.LB_PortSTATE_MCU.TabIndex = 29;
+            this.LB_PortSTATE_MCU.Text = "Port";
+            // 
+            // btn_setting
+            // 
+            this.btn_setting.Location = new System.Drawing.Point(12, 496);
+            this.btn_setting.Name = "btn_setting";
+            this.btn_setting.Size = new System.Drawing.Size(108, 27);
+            this.btn_setting.TabIndex = 28;
+            this.btn_setting.Text = "GetSetting";
+            this.btn_setting.UseVisualStyleBackColor = true;
+            this.btn_setting.Visible = false;
+            this.btn_setting.Click += new System.EventHandler(this.btn_set_Click);
+            // 
+            // btnFormat
+            // 
+            this.btnFormat.Location = new System.Drawing.Point(15, 494);
+            this.btnFormat.Name = "btnFormat";
+            this.btnFormat.Size = new System.Drawing.Size(108, 27);
+            this.btnFormat.TabIndex = 26;
+            this.btnFormat.Text = "Format";
+            this.btnFormat.UseVisualStyleBackColor = true;
+            this.btnFormat.Visible = false;
+            this.btnFormat.Click += new System.EventHandler(this.btnFormat_Click);
+            // 
+            // PB_Port_OFF
+            // 
+            this.PB_Port_OFF.Image = global::SprinklerProject.Properties.Resources.Switch_off;
+            this.PB_Port_OFF.Location = new System.Drawing.Point(45, 332);
+            this.PB_Port_OFF.Name = "PB_Port_OFF";
+            this.PB_Port_OFF.Size = new System.Drawing.Size(78, 48);
+            this.PB_Port_OFF.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PB_Port_OFF.TabIndex = 25;
+            this.PB_Port_OFF.TabStop = false;
+            // 
+            // PB_Cam_OFF
+            // 
+            this.PB_Cam_OFF.Image = global::SprinklerProject.Properties.Resources.Switch_off;
+            this.PB_Cam_OFF.Location = new System.Drawing.Point(45, 284);
+            this.PB_Cam_OFF.Name = "PB_Cam_OFF";
+            this.PB_Cam_OFF.Size = new System.Drawing.Size(78, 48);
+            this.PB_Cam_OFF.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PB_Cam_OFF.TabIndex = 24;
+            this.PB_Cam_OFF.TabStop = false;
+            // 
+            // PB_Port_ON
+            // 
+            this.PB_Port_ON.Image = global::SprinklerProject.Properties.Resources.Switch_on;
+            this.PB_Port_ON.Location = new System.Drawing.Point(45, 332);
+            this.PB_Port_ON.Name = "PB_Port_ON";
+            this.PB_Port_ON.Size = new System.Drawing.Size(78, 48);
+            this.PB_Port_ON.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PB_Port_ON.TabIndex = 23;
+            this.PB_Port_ON.TabStop = false;
+            this.PB_Port_ON.Visible = false;
+            // 
+            // LB_PortSTATE
+            // 
+            this.LB_PortSTATE.AutoSize = true;
+            this.LB_PortSTATE.Font = new System.Drawing.Font("맑은 고딕", 12F);
+            this.LB_PortSTATE.Location = new System.Drawing.Point(4, 346);
+            this.LB_PortSTATE.Name = "LB_PortSTATE";
+            this.LB_PortSTATE.Size = new System.Drawing.Size(41, 21);
+            this.LB_PortSTATE.TabIndex = 22;
+            this.LB_PortSTATE.Text = "Port";
+            // 
+            // PB_Cam_ON
+            // 
+            this.PB_Cam_ON.Image = global::SprinklerProject.Properties.Resources.Switch_on;
+            this.PB_Cam_ON.Location = new System.Drawing.Point(45, 284);
+            this.PB_Cam_ON.Name = "PB_Cam_ON";
+            this.PB_Cam_ON.Size = new System.Drawing.Size(78, 48);
+            this.PB_Cam_ON.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PB_Cam_ON.TabIndex = 21;
+            this.PB_Cam_ON.TabStop = false;
+            this.PB_Cam_ON.Visible = false;
+            // 
+            // LB_CAMSTATE
+            // 
+            this.LB_CAMSTATE.AutoSize = true;
+            this.LB_CAMSTATE.Font = new System.Drawing.Font("맑은 고딕", 12F);
+            this.LB_CAMSTATE.Location = new System.Drawing.Point(4, 298);
+            this.LB_CAMSTATE.Name = "LB_CAMSTATE";
+            this.LB_CAMSTATE.Size = new System.Drawing.Size(42, 21);
+            this.LB_CAMSTATE.TabIndex = 20;
+            this.LB_CAMSTATE.Text = "Cam";
+            // 
+            // PictureBox_logo
+            // 
+            this.PictureBox_logo.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_logo.Image")));
+            this.PictureBox_logo.Location = new System.Drawing.Point(0, 0);
+            this.PictureBox_logo.Name = "PictureBox_logo";
+            this.PictureBox_logo.Size = new System.Drawing.Size(126, 75);
+            this.PictureBox_logo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PictureBox_logo.TabIndex = 19;
+            this.PictureBox_logo.TabStop = false;
+            // 
+            // PB_Port_ON_MCU
+            // 
+            this.PB_Port_ON_MCU.Image = global::SprinklerProject.Properties.Resources.Switch_on;
+            this.PB_Port_ON_MCU.Location = new System.Drawing.Point(45, 380);
+            this.PB_Port_ON_MCU.Name = "PB_Port_ON_MCU";
+            this.PB_Port_ON_MCU.Size = new System.Drawing.Size(78, 48);
+            this.PB_Port_ON_MCU.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PB_Port_ON_MCU.TabIndex = 31;
+            this.PB_Port_ON_MCU.TabStop = false;
+            this.PB_Port_ON_MCU.Visible = false;
+            // 
+            // Sprinkler
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1325, 541);
+            this.ClientSize = new System.Drawing.Size(1225, 541);
             this.Controls.Add(this.Panel_Line);
             this.Controls.Add(this.Panel_Tabcontrol);
             this.Controls.Add(this.btnCamTab);
@@ -846,10 +1177,9 @@
             this.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.ForeColor = System.Drawing.Color.Black;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "Form1";
-            this.Text = "Form1";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.Name = "Sprinkler";
+            this.Text = "Sprinkler";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Sprinkler_FormClosing);
             this.gbSettings.ResumeLayout(false);
             this.gbSettings.PerformLayout();
             this.gbTemperature.ResumeLayout(false);
@@ -858,13 +1188,27 @@
             this.camPage.ResumeLayout(false);
             this.camPage.PerformLayout();
             this.groupBox1.ResumeLayout(false);
+            this.Panel_Icon.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Icon)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.portPage.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.Panel_Tabcontrol.ResumeLayout(false);
             this.Panel_box.ResumeLayout(false);
+            this.Panel_box.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_FIRE)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Port_OFF_MCU)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Port_OFF)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Cam_OFF)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Port_ON)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Cam_ON)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_logo)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PB_Port_ON_MCU)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -873,7 +1217,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.TextBox tbInfo;
-        private System.Windows.Forms.RadioButton rbtnGrayScale;
+        private System.Windows.Forms.RadioButton rbtnGray;
         private System.Windows.Forms.RadioButton rbtnRGB;
         private System.Windows.Forms.RadioButton rbtnBinary;
         private System.Windows.Forms.GroupBox gbSettings;
@@ -889,8 +1233,6 @@
         private System.Windows.Forms.Label lblRadEnable;
         private System.Windows.Forms.ComboBox cbTLinearEnable;
         private System.Windows.Forms.Label lblTLinearEnable;
-        private System.Windows.Forms.ComboBox cbHotColor;
-        private System.Windows.Forms.Label lblHotColor;
         private System.Windows.Forms.Button btnGainModeObj;
         private System.Windows.Forms.GroupBox gbTemperature;
         private System.Windows.Forms.Label lblMinTemp;
@@ -919,7 +1261,6 @@
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.Timer timer_ImgProcess;
         private System.Windows.Forms.Timer timer_Setting;
-        private System.Windows.Forms.Label lblState;
         private System.Windows.Forms.TextBox TB_Com;
         private System.Windows.Forms.Label LB_Conn_Com;
         private System.Windows.Forms.Button BTN_Disconn_Com;
@@ -937,6 +1278,34 @@
         private System.Windows.Forms.Panel Panel_Line;
         private System.Windows.Forms.Panel Panel_box;
         private System.Windows.Forms.Panel Panel_Cam;
+        private System.Windows.Forms.Panel Panel_Icon;
+        private System.Windows.Forms.PictureBox PictureBox_Icon;
+        private System.Windows.Forms.Label lblState;
+        private System.Windows.Forms.PictureBox PictureBox_logo;
+        private System.Windows.Forms.Label LB_CAMSTATE;
+        private System.Windows.Forms.PictureBox PB_Cam_ON;
+        private System.Windows.Forms.PictureBox PB_Port_ON;
+        private System.Windows.Forms.Label LB_PortSTATE;
+        private System.Windows.Forms.PictureBox PB_Port_OFF;
+        private System.Windows.Forms.PictureBox PB_Cam_OFF;
+        private System.Windows.Forms.Button btnFormat;
+        private System.Windows.Forms.Button btn_setting;
+        private System.IO.Ports.SerialPort SerialPort_MCU;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox TB_Com_MCU;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox cbCom_MCU;
+        private System.Windows.Forms.Button BTN_Disconn_Com_MCU;
+        private System.Windows.Forms.Button btnGetPort_MCU;
+        private System.Windows.Forms.Button BTN_Conn_Com_MCU;
+        private System.Windows.Forms.PictureBox PB_Port_OFF_MCU;
+        private System.Windows.Forms.Label LB_PortSTATE_MCU;
+        private System.Windows.Forms.PictureBox PB_Port_ON_MCU;
+        private System.Windows.Forms.PictureBox PB_FIRE;
+        private System.Windows.Forms.Label LB_FIRE_STATE;
+        private System.Windows.Forms.Button BTN_RESET_STATE;
+        private System.Windows.Forms.Button BTN_GET_SETTING;
     }
 }
 

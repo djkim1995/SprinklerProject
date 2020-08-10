@@ -102,18 +102,38 @@ namespace SprinklerProject
                         else
                             MessageBox.Show(lepton.rad.GetTLinearEnableState() + "Format 설정 오류 발생");
                         break;
-                        
+
                     case 6:
+                        //GetPolarity
+                        if (lepton.vid.GetPolarity().Equals(CCI.Vid.Polarity.BLACK_HOT))
+                            cbHotColor.SelectedIndex = 0;
+                        else if (lepton.vid.GetPolarity().Equals(CCI.Vid.Polarity.WHITE_HOT))
+                            cbHotColor.SelectedIndex = 1;
+                        else
+                            MessageBox.Show(lepton.vid.GetPolarity() + "Format 설정 오류 발생");
+                        break;
+
+                    case 7:
+                        //GetTelemetry
+                        if (lepton.sys.GetTelemetryEnableState().Equals(CCI.Sys.TelemetryEnableState.TELEMETRY_DISABLED))
+                            cbTelemetry.SelectedIndex = 0;
+                        else if (lepton.sys.GetTelemetryEnableState().Equals(CCI.Sys.TelemetryEnableState.TELEMETRY_ENABLED))
+                            cbTelemetry.SelectedIndex = 1;
+                        else
+                            MessageBox.Show(lepton.sys.GetTelemetryEnableState() + "Format 설정 오류 발생");
+                        break;
+
+                    case 8:
                         timer_Setting.Enabled = false;
                         timer_Setting.Stop();
-                        MessageBox.Show("Get Setting Complete");
+                        MessageBox.Show("settingCount : " + settingCount);
                         break;
 
                     default:
                         break;
                 }
                 settingCount++;
-                settingCount = settingCount % 7;
+                settingCount = settingCount % 8;
 
                 timerCount_Setting = 0;
             }
@@ -123,6 +143,11 @@ namespace SprinklerProject
         private void ImageProcess(object sender, EventArgs e)
         {
             this.Invoke(new EventHandler(ImageProcessHandler));
+            /*
+            Mat frame_test = new Mat();
+            capture.Read(frame_test);
+            Cv2.ImShow("frame", frame_test);
+            */
         }
 
         private void ImageProcessHandler(object sender, EventArgs e)
@@ -160,7 +185,7 @@ namespace SprinklerProject
                         {
                             double area = Cv2.ContourArea(p, true);
 
-                            if (area > 100 && cbGainMode.Text == "HIGH")
+                            if (area > 100 && cbGainMode.Text == "LOW")
                             {
                                 Rect boundingRect = Cv2.BoundingRect(p);
 
@@ -171,8 +196,7 @@ namespace SprinklerProject
 
                                 Cv2.Rectangle(frame_result, boundingRect, Scalar.Black, 2);
 
-                                if (PB_FIRE.Visible == true)
-                                    SpotCheck(writeBuffer);     // 좌표 비교 및 alive 비교
+                                SpotCheck(writeBuffer);     // 좌표 비교 및 alive 비교
                             }
                         }
                         ListViewUpdate();
@@ -204,7 +228,9 @@ namespace SprinklerProject
             }
             catch (Exception)
             {
-                Disconnect_Cam();
+                //Disconnect_Cam();
+                //MessageBox.Show("frame Error", "System Message");
+                Start_Camera();
             }
         }
 
@@ -322,8 +348,7 @@ namespace SprinklerProject
 
         private void CheckSpot(object sender, EventArgs e)
         {
-            //if (lblState.Text.Equals("READY") && (PB_FIRE.Visible == true))   //★★★
-            if (lblState.Text.Equals("READY"))
+            if (lblState.Text.Equals("Ready"))
             {
                 if (listView1.Items.Count > 0)
                 {
@@ -334,9 +359,22 @@ namespace SprinklerProject
                             byte[] packet = Packaging_DetectedSpot();
                             SerialPort.Write(packet, 0, packet.Length); //USB : 64byte
                             //MessageBox.Show("Write : [" + packet.Length + "] bytes\r\n" + "stopbits : " + SerialPort.StopBits + "\r\nBaud rate : " + SerialPort.BaudRate);
-                            lblState.Text = "WAITING";
-                            lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(247)))), ((int)(((byte)(202)))), ((int)(((byte)(201)))));
-                            PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_waiting;
+                            lblState.Text = "Waiting";
+                            lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(199)))), ((int)(((byte)(207)))));
+                        }
+                        catch (ArgumentNullException) { MessageBox.Show("Empty Argument", "System Message"); }
+                        catch (InvalidOperationException) { MessageBox.Show("COM Port was Not Opened", "System Message"); }
+                        catch (TimeoutException) { MessageBox.Show("Time out! Pleasy retry", "System Message"); }
+                    }
+                    if (SerialPort_MCU.IsOpen)
+                    {
+                        try
+                        {
+                            byte[] packet = Packaging_Spray();
+                            SerialPort_MCU.Write(packet, 0, packet.Length); //USB : 64byte
+                            //MessageBox.Show("Write : [" + packet.Length + "] bytes\r\n" + "stopbits : " + SerialPort.StopBits + "\r\nBaud rate : " + SerialPort.BaudRate);
+                            lblState.Text = "Waiting";
+                            lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(88)))), ((int)(((byte)(199)))), ((int)(((byte)(207)))));
                         }
                         catch (ArgumentNullException) { MessageBox.Show("Empty Argument", "System Message"); }
                         catch (InvalidOperationException) { MessageBox.Show("COM Port was Not Opened", "System Message"); }
@@ -356,7 +394,7 @@ namespace SprinklerProject
             string[] string_split;
 
             TXpacket.Add(Convert.ToByte('S'));
-            TXpacket.Add(0x10); //Spot Write Command
+            TXpacket.Add(0x01); //Spot Write Command
 
             for (int i = 0; i < listView1.Items.Count; i++)
             {
@@ -424,6 +462,25 @@ namespace SprinklerProject
             return TXpacketarr;
         }
         
+        private byte[] Packaging_Spray()
+        {
+            List<byte> TXpacket = new List<byte>();
+            List<byte> readSpot = new List<byte>();
+
+            TXpacket.Add(Convert.ToByte('S'));
+            TXpacket.Add(0x10);         //SprayCall Command
+            for (int i = 0; i < (64 - 4); i++)
+            {
+                TXpacket.Add(0x00);
+            }
+            TXpacket.Add(0);            //checksum
+            TXpacket.Add(Convert.ToByte('T'));
+
+            byte[] TXpacketarr = TXpacket.ToArray();
+
+            return TXpacketarr;
+        }
+
         private void SerialWrite(byte[] writeBuffer)
         {
             try
@@ -500,7 +557,7 @@ namespace SprinklerProject
             timer_SendSpot.Interval = 1000; //1 sec
             timer_SendSpot.Tick += new EventHandler(CheckSpot);
 
-            timer_ImgProcess.Interval = 200; // 200 milli sec
+            timer_ImgProcess.Interval = 100; // 100 milli sec
             timer_ImgProcess.Tick += new EventHandler(ImageProcess);
 
             timer_Setting.Interval = 50; // 50 milli sec
@@ -569,6 +626,22 @@ namespace SprinklerProject
             else if (cbTLinearEnable.SelectedIndex == 1)
                 lepton.rad.SetTLinearEnableState(CCI.Rad.Enable.ENABLE);
         }
+
+        private void cbHotColor_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbHotColor.SelectedIndex == 0)
+                lepton.vid.SetPolarity(CCI.Vid.Polarity.BLACK_HOT);
+            else if (cbHotColor.SelectedIndex == 1)
+                lepton.vid.SetPolarity(CCI.Vid.Polarity.WHITE_HOT);
+        }
+
+        private void cbTelemetry_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbTelemetry.SelectedIndex == 0)
+                lepton.sys.SetTelemetryEnableState(CCI.Sys.TelemetryEnableState.TELEMETRY_DISABLED);
+            else if (cbTelemetry.SelectedIndex == 1)
+                lepton.sys.SetTelemetryEnableState(CCI.Sys.TelemetryEnableState.TELEMETRY_ENABLED);
+        }
         #endregion
 
         #region Button Event
@@ -598,7 +671,7 @@ namespace SprinklerProject
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
-            if(btnOpen.Text.Equals("OPEN"))
+            if(btnOpen.Text.Equals("Open"))
             {
                 var devices = Lepton.CCI.GetDevices();
                 try {
@@ -613,7 +686,6 @@ namespace SprinklerProject
                             //device.Open().oem.SetVideoOutputFormat(Lepton.CCI.Oem.VideoOutputFormat.RAW14);
                             lepton = device.Open();
                             //lepton.oem.SetVideoOutputSource(CCI.Oem.VideoOutputSource.RAW);
-                            BTN_GET_SETTING.Enabled = true;
                             btnOpen.Enabled = false;
                             MessageBox.Show("Device Opened");
                         }
@@ -629,21 +701,26 @@ namespace SprinklerProject
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            if (btnStart.Text.Equals("START"))
+            Start_Camera();
+        }
+
+        private void Start_Camera()
+        {
+            if (btnStart.Text.Equals("Start"))
             {
-                btnStart.Text = "STOP";
+                btnStart.Text = "Stop";
                 btnStart.BackColor = SystemColors.ActiveCaption;
                 Panel_Cam.SendToBack();
                 timer_SendSpot.Enabled = true;
                 timer_SendSpot.Start();
                 timer_ImgProcess.Enabled = true;
                 timer_ImgProcess.Start();
-                //timer_Setting.Enabled = true;
-                //timer_Setting.Start();
+                timer_Setting.Enabled = true;
+                timer_Setting.Start();
             }
             else
             {
-                btnStart.Text = "START";
+                btnStart.Text = "Start";
                 btnStart.BackColor = SystemColors.ActiveCaption;
                 timer_SendSpot.Enabled = false;
                 timer_SendSpot.Stop();
@@ -778,49 +855,6 @@ namespace SprinklerProject
             Disconnect_Cam();
         }
 
-        private void BTN_RESET_STATE_Click(object sender, EventArgs e)
-        {
-            /*
-            lblState.Text = "READY";
-            lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-            */
-            switch (lblState.Text)
-            {
-                case "READY":
-                    lblState.Text = "WAITING";
-                    lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(247)))), ((int)(((byte)(202)))), ((int)(((byte)(201)))));
-                    PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_waiting;
-                    break;
-                case "WAITING":
-                    lblState.Text = "MOVING";
-                    lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(255)))), ((int)(((byte)(169)))));
-                    PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_moving;
-                    break;
-                case "MOVING":
-                    lblState.Text = "SHOOT";
-                    lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(255)))), ((int)(((byte)(171)))));
-                    PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_shoot;
-                    break;
-                case "SHOOT":
-                    lblState.Text = "MOVING_";
-                    lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(255)))), ((int)(((byte)(169)))));
-                    PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_moving;
-                    break;
-                case "MOVING_":
-                    lblState.Text = "READY";
-                    lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-                    PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_ready;
-                    break;
-            }
-
-        }
-
-        private void BTN_GET_SETTING_Click(object sender, EventArgs e)
-        {
-            timer_Setting.Enabled = true;
-            timer_Setting.Start();
-        }
-
         private void btnGainModeObj_Click(object sender, EventArgs e)
         {
             lepton.sys.SetGainModeObj(gainModeObj);
@@ -864,8 +898,8 @@ namespace SprinklerProject
         private void GetAvailablePort()
         {
             String[] port = SerialPort.GetPortNames();
-            cbCom.Items.Clear();
-            cbCom.Items.AddRange(port);
+            cbCom_MCU.Items.Clear();
+            cbCom_MCU.Items.AddRange(port);
         }
         
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -875,152 +909,27 @@ namespace SprinklerProject
 
         private void MySerialReceived(object sender, EventArgs e)
         {
-            if (SerialPort.IsOpen)
+            if (SerialPort_MCU.IsOpen)
             {
                 int NumOfRcvs = SerialPort.BytesToRead;
-                if (NumOfRcvs == 64)
+                if (NumOfRcvs != 0)
                 {
                     byte[] buf = new byte[NumOfRcvs];
-                    SerialPort.Read(buf, 0, NumOfRcvs);
+                    SerialPort_MCU.Read(buf, 0, NumOfRcvs);
                     if ((Convert.ToChar(buf[0]) == 'S') && (Convert.ToChar(buf[63]) == 'T'))
                     {
-                        if (buf[1] == 0x01)         // Spot Send Response [0x01]
+                        if (buf[1] == 0x01)         // Spot Send Response
                         {
-                            lblState.Text = "MOVING";
-                            lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(255)))), ((int)(((byte)(169)))));
-                            PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_moving;
+                            lblState.Text = "Moving";
                             //MessageBox.Show("Send Message Complete", "System Message");
                         }
-                        else if (buf[1] == 0x02)    // Move End [0x02]
+                        else if (buf[1] == 0x02)    // End Moving
                         {
-                            byte[] packet;
-
-                            if (PB_FIRE.Visible == true)
-                            {
-                                lblState.Text = "SHOOT";
-                                lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(255)))), ((int)(((byte)(171)))));
-                                PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_shoot;
-
-                                packet = Packaging_Spray_Start();
-                                SerialPort_MCU.Write(packet, 0, packet.Length); //USB : 64byte
-
-                                packet = Packaging_MotionMoving();
-                                SerialPort.Write(packet, 0, packet.Length); //USB : 64byte
-                            }
-                            else
-                            {
-                                lblState.Text = "MOVING";
-                                lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(255)))), ((int)(((byte)(169)))));
-                                PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_moving;
-                                packet = Packaging_MoveHome();
-                                SerialPort.Write(packet, 0, packet.Length); //USB : 64byte
-                            }
-                        }
-                        else if (buf[1] == 0x03)    // Motion Moving End [0x03]
-                        {
-                            lblState.Text = "MOVING";
-                            lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(253)))), ((int)(((byte)(255)))), ((int)(((byte)(169)))));
-                            PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_moving;
-
-                            byte[] packet = Packaging_Spray_Stop();
-                            SerialPort_MCU.Write(packet, 0, packet.Length); //USB : 64byte
-
-                            packet = Packaging_MoveHome();
-                            SerialPort.Write(packet, 0, packet.Length); //USB : 64byte
-                        }
-                        else if (buf[1] == 0x04)    // Move to Home End [0x04]
-                        {
-                            lblState.Text = "READY";
-                            lblState.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
-                            PictureBox_Icon.Image = global::SprinklerProject.Properties.Resources.icon_ready;
-                        }
-                        else if (buf[1] == 0x05)    // Recall
-                        {
-                            MessageBox.Show("Data Transmit Fail", "System Message");
+                            lblState.Text = "";
                         }
                     }
                 }
             }
-        }
-
-        //Send to MCX514 0x30
-        private byte[] Packaging_MoveHome()
-        {
-            List<byte> TXpacket = new List<byte>();
-            List<byte> readSpot = new List<byte>();
-
-            TXpacket.Add(Convert.ToByte('S'));
-            TXpacket.Add(0x30);         //Move to Home Command
-            for (int i = 0; i < (64 - 4); i++)
-            {
-                TXpacket.Add(0x00);
-            }
-            TXpacket.Add(0);            //checksum
-            TXpacket.Add(Convert.ToByte('T'));
-
-            byte[] TXpacketarr = TXpacket.ToArray();
-
-            return TXpacketarr;
-        }
-
-        //Send to MCX514 0x20
-        private byte[] Packaging_MotionMoving()
-        {
-            List<byte> TXpacket = new List<byte>();
-            List<byte> readSpot = new List<byte>();
-
-            TXpacket.Add(Convert.ToByte('S'));
-            TXpacket.Add(0x20);         //SprayCall Command
-            for (int i = 0; i < (64 - 4); i++)
-            {
-                TXpacket.Add(0x00);
-            }
-            TXpacket.Add(0);            //checksum
-            TXpacket.Add(Convert.ToByte('T'));
-
-            byte[] TXpacketarr = TXpacket.ToArray();
-
-            return TXpacketarr;
-        }
-
-        //Send to MCU 0x20
-        private byte[] Packaging_Spray_Stop()
-        {
-            List<byte> TXpacket = new List<byte>();
-            List<byte> readSpot = new List<byte>();
-
-            TXpacket.Add(Convert.ToByte('S'));
-            TXpacket.Add(0x20);         //Spray Clear Command
-            for (int i = 0; i < (64 - 4); i++)
-            {
-                TXpacket.Add(0x00);
-            }
-            TXpacket.Add(0);            //checksum
-            TXpacket.Add(Convert.ToByte('T'));
-
-            byte[] TXpacketarr = TXpacket.ToArray();
-
-            return TXpacketarr;
-        }
-
-        //Send to MCU 0x10
-        private byte[] Packaging_Spray_Start()
-        {
-            List<byte> TXpacket = new List<byte>();
-            List<byte> readSpot = new List<byte>();
-
-            TXpacket.Add(Convert.ToByte('S'));
-            TXpacket.Add(0x10);         //Spray Call Command
-            for (int i = 0; i < (64 - 4); i++)
-            {
-                TXpacket.Add(0x00);
-            }
-            TXpacket.Add(0);            //checksum
-            TXpacket.Add(Convert.ToByte('T'));
-
-            byte[] TXpacketarr = TXpacket.ToArray();
-
-            return TXpacketarr;
         }
         #endregion
 
@@ -1121,16 +1030,11 @@ namespace SprinklerProject
         }
         #endregion
 
+
         #region MCU Port, ★★★나중에 삭제★★★
-        private void GetAvailablePort_MCU()
-        {
-            String[] port = SerialPort.GetPortNames();
-            cbCom_MCU.Items.Clear();
-            cbCom_MCU.Items.AddRange(port);
-        }
         private void btnGetPort_MCU_Click(object sender, EventArgs e)
         {
-            GetAvailablePort_MCU();
+            GetAvailablePort();
         }
 
         private void BTN_Conn_Com_MCU_Click(object sender, EventArgs e)
@@ -1188,20 +1092,21 @@ namespace SprinklerProject
         {
             if(SerialPort_MCU.IsOpen)
             {
-                int NumOfRcvs = SerialPort_MCU.BytesToRead;
-                if(NumOfRcvs == 64)
+                int NumOfRcvs = SerialPort.BytesToRead;
+                if(NumOfRcvs != 0)
                 {
                     byte[] buf = new byte[NumOfRcvs];
                     SerialPort_MCU.Read(buf, 0, NumOfRcvs);
                     if((Convert.ToChar(buf[0]) == 'S') && (Convert.ToChar(buf[63]) == 'T'))
                     {
-                        if(buf[1] == 0x01)          // Fire Detection [0x01]
+                        if(buf[1] == 0x01)
                         {
-                            if (buf[2] == 0x01)
-                                PB_FIRE.Visible = true;
-                            else if (buf[2] == 0x00)
-                                PB_FIRE.Visible = false;
+                            lblState.Text = "Shooting";
                             //MessageBox.Show("Send Message Complete", "System Message");
+                        }
+                        else if(buf[1] == 0x02)
+                        {
+                            lblState.Text = "";
                         }
                     }
                 }
@@ -1231,8 +1136,6 @@ namespace SprinklerProject
             }
         }
         #endregion
-
-
     }
 }
 
@@ -1248,15 +1151,3 @@ MessageBox.Show(sw.ElapsedMilliseconds.ToString() + "ms");
  * Timer 오프셋 줘서 안겹치게하기
  * Initiating state에서 워치독 확인되면 Ready단계로 변경
 */
-
-
-
- /* 추가한 기능 목록
-  * RESET버튼 눌러서 STATE 초기화
-  * UART
-  * UART 수신에 따른 STATE 변화
-  * PB_FIRE추가함, PB_FIRE.Visible이 true 일 때만 ImageProcess 실행
-  * getSetting을 시작시 자동이 아닌, 버튼이벤트로 변경
-  * 프로세스 중 사각형 유지
-  * BoundingRect를 전역변수로 변경 //취소함
- */
